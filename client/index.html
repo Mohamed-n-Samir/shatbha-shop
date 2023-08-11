@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<!-- Meta data -->
+		<meta charset="UTF-8" />
+		<base href="/" />
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1.0, user-scalable=yes"
+		/>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+		<link rel="preload" href="/colLogo.svg" as="image">
+
+		<!-- Style css -->
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<script>
+			(function () {
+				var link = document.createElement("link");
+				link.rel = "stylesheet";
+				link.href =
+					"https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap";
+				document.head.appendChild(link);
+			})();
+		</script>
+	</head>
+	<body>
+		<div id="root"></div>
+		<script type="module" src="/src/main.jsx"></script>
+	</body>
+</html>

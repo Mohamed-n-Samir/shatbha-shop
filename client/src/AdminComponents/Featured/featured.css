@@ -1,0 +1,9 @@
+.featured {
+    flex: 2;
+	box-shadow: 0.2rem 0.4rem 1rem 0.3rem rgba(201, 201, 201, 0.47);
+}
+
+.featured .bottom .featured-chart{
+    width: 10rem;
+    height: 10rem;
+}

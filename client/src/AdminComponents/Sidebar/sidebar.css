@@ -1,0 +1,50 @@
+.sidebar {
+	border-left: 0.5px solid var(--gray-color);
+	min-height: 100vh;
+	background-color: var(--white-color);
+	flex: 1.3;
+}
+
+.sidebar .top {
+	height: 5rem;
+	border-bottom: 0.5px solid var(--gray-color);
+}
+
+.sidebar .top .logo {
+	color: var(--black-color);
+}
+
+.sidebar .center .sidebar-items .title {
+	color: var(--gray2-color);
+	margin: 1.5rem 0 0.5rem 0;
+}
+
+.sidebar .center .sidebar-items .sidebar-item {
+	cursor: pointer;
+}
+
+.sidebar .center .sidebar-items .sidebar-item a:hover {
+	background-color: var(--gray2-color);
+    border-radius: .4rem;
+}
+
+.sidebar .center .sidebar-items .sidebar-item .active-style {
+	background-color: var(--gray2-color);
+    border-radius: .4rem;
+}
+
+.sidebar .bottom .color-option {
+	width: 2rem;
+	height: 2rem;
+	border-radius: 0.5rem;
+	border: 1px solid var(--purple-color);
+	cursor: pointer;
+}
+
+.sidebar .bottom .color-option:nth-child(1) {
+	background-color: var(--white-color);
+}
+
+.sidebar .bottom .color-option:nth-child(2) {
+	background-color: var(--black-color);
+}

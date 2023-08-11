@@ -1,0 +1,22 @@
+/* .form-container {
+    background-color: ;
+} */
+
+.register-form {
+	font-size: 1.6rem;
+}
+
+.register-form input:not([type="radio"]) {
+	padding: 1rem;
+	font-size: 1.2rem;
+}
+
+.form-select {
+	--bs-form-select-bg-img: "";
+	appearance: auto;
+}
+
+.form-select option {
+
+	font-size: 1.4rem;
+}

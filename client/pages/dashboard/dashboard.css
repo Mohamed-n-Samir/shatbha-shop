@@ -1,0 +1,9 @@
+.dashboard-home .dashboard-home-container {
+	flex: 6;
+}
+
+.dashboard-home .dashboard-home-container .list-container{
+    border-radius: 1rem;
+    box-shadow: -0.2rem 0.4rem 1rem 0.3rem rgba(201, 201, 201, 0.47);
+
+}

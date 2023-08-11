@@ -1,0 +1,57 @@
+.is-page-loading {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 100vh;
+}
+
+.loading-section {
+	height: 5rem;
+}
+
+textarea:focus,
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="datetime"]:focus,
+input[type="datetime-local"]:focus,
+input[type="date"]:focus,
+input[type="month"]:focus,
+input[type="time"]:focus,
+input[type="week"]:focus,
+input[type="number"]:focus,
+input[type="email"]:focus,
+input[type="url"]:focus,
+input[type="search"]:focus,
+input[type="tel"]:focus,
+input[type="color"]:focus,
+.form-select:focus,
+.form-select:focus,
+.uneditable-input:focus {   
+  border-color: rgba(0, 0, 0, 0.4) !important;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.075) inset !important;
+  outline: 0 none !important;
+}
+
+.form-check-input:checked{
+	background-color: black !important;	
+	border-color: gray !important;
+}
+
+.is-loading {
+	flex: 2;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	min-height: 30rem;
+	box-shadow: 0.2rem 0.4rem 1rem 0.1rem rgba(201, 201, 201, 0.47);
+}
+
+.is-error {
+	flex: 2;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	min-height: 30rem;
+	box-shadow: 0.2rem 0.4rem 1rem 0.1rem rgba(201, 201, 201, 0.47);
+}
+

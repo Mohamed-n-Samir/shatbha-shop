@@ -1,0 +1,16 @@
+.layout-container {
+    padding: 0;
+}
+
+.carousel-inner {
+}
+
+.carousel-item img{
+}
+
+.carousel-control-next-icon,
+.carousel-control-prev-icon {
+	height: 3rem;
+	width: 3rem;
+    fill: var(--black-color);
+}

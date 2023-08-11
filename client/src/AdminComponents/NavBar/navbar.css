@@ -1,0 +1,21 @@
+.dash-navbar {
+    height: 5rem;
+    border-bottom: .5px solid var(--gray-color);
+    color: var(--text2-color);
+}
+
+.dash-navbar .wrapper .search {
+    border: .1rem solid var(--gray-color);
+}
+
+
+.dash-navbar .wrapper .search input {
+    border: none;
+    outline: none;
+    background-color: transparent;
+}
+
+.dash-navbar .wrapper .search input::placeholder {
+    color: var(--text2-color);
+}
+

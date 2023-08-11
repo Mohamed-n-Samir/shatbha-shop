@@ -1,0 +1,38 @@
+{
+	"name": "shatbha",
+	"proxy": "http://localhost:8080/",
+	"private": true,
+	"version": "0.0.0",
+	"type": "module",
+	"scripts": {
+		"dev": "vite",
+		"build": "vite build --base=./",
+		"preview": "vite preview",
+		"host": "vite --host"
+	},
+	"dependencies": {
+		"@tanstack/react-query": "^4.29.14",
+		"axios": "^1.3.4",
+		"bootstrap": "^5.3.1",
+		"formik": "^2.2.9",
+		"material-react-table": "^1.14.0",
+		"react": "^18.2.0",
+		"react-bootstrap": "^2.8.0",
+		"react-circular-progressbar": "^2.1.0",
+		"react-dom": "^18.2.0",
+		"react-helmet-async": "^1.3.0",
+		"react-responsive": "^9.0.2",
+		"react-router-dom": "^6.8.1",
+		"react-spinners": "^0.13.8",
+		"react-toastify": "^9.1.3",
+		"recharts": "^2.7.3",
+		"yup": "^1.0.0"
+	},
+	"devDependencies": {
+		"@types/react": "^18.0.27",
+		"@types/react-dom": "^18.0.10",
+		"@vitejs/plugin-react": "^3.1.0",
+		"vite": "^4.1.0",
+		"vite-plugin-svgr": "^3.2.0"
+	}
+}
