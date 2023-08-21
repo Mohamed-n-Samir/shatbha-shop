@@ -2,4 +2,5 @@
     width: 100%;
     /* min-height: 90vh; */
     background-color: var(--bg-color);
+    padding-bottom: 2rem !important;
 }

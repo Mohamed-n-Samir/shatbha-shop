@@ -1,0 +1,41 @@
+.register-form {
+	font-size: 1.6rem;
+}
+
+.register-form input:not([type="radio"]),.register-form select {
+	padding: 1rem;
+	font-size: 1.2rem;
+	margin:  0 0 1rem 0 ;
+}
+
+.form-select {
+	--bs-form-select-bg-img: "";
+	appearance: auto;
+}
+
+.form-select option {
+
+	font-size: 1.4rem;
+}
+.form-select {
+	--bs-form-select-bg-img: "";
+	appearance: auto;
+}
+
+.form-select option {
+
+	font-size: 1.4rem;
+}
+
+.css-1t1j96h-MuiPaper-root-MuiDialog-paper {
+    width: 50rem;
+}
+
+select[multiple] {
+	height: 10rem;
+	
+}
+select[multiple] option{
+	font-size: 1.4rem;
+
+}

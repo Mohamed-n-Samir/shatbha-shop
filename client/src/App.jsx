@@ -14,7 +14,13 @@ const Profile = lazy(() => import("../pages/profile/Profile"));
 const Login = lazy(() => import("../pages/login/Login"));
 const Dashboard = lazy(() => import("../pages/dashboard/Dashboard"));
 const Users = lazy(() => import("../pages/users/Users"));
+const Admins = lazy(() => import("../pages/admins/Admins"));
+const Products = lazy(() => import("../pages/products/Products"));
+const Category = lazy(() => import("../pages/category/Category"));
+const Brands = lazy(() => import("../pages/brands/Brands"));
+const SubCategory = lazy(() => import("../pages/subCategory/SubCategory"));
 const Store = lazy(() => import("../pages/store/Store"));
+const Search = lazy(() => import("../pages/search/Search"));
 const PrivateRoute = lazy(() => import("./utils/PrivateRoute/PrivateRoute"));
 
 function App() {
@@ -24,11 +30,32 @@ function App() {
 				<Route index element={<Home />} />
 				<Route path="register" element={<Register />} exact />
 				<Route path="profile" element={<Profile />} exact />
-				<Route path="store" element={<Store />} exact />
+				<Route path="search/:searchString" element={<Search />} exact />
 				<Route path="login" element={<Login />} exact />
+				<Route path="products" exact>
+					<Route index element={<Store />} />
+					{/* <Route path=":slug" element={<Login />} exact /> */}
+				</Route>
 				<Route element={<PrivateRoute />}>
 					<Route path="dashboard" element={<Dashboard />} exact />
 					<Route path="dashboard/users" element={<Users />} exact />
+					<Route path="dashboard/admins" element={<Admins />} exact />
+					<Route
+						path="dashboard/products"
+						element={<Products />}
+						exact
+					/>
+					<Route path="dashboard/brands" element={<Brands />} exact />
+					<Route
+						path="dashboard/categories"
+						element={<Category />}
+						exact
+					/>
+					<Route
+						path="dashboard/subCategories"
+						element={<SubCategory />}
+						exact
+					/>
 				</Route>
 			</Route>
 			<Route path="*" element={<NF404 />} exact>

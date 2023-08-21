@@ -2,36 +2,55 @@ const Category = require("../model/prodcategoryModel.js");
 const asyncHandler = require("express-async-handler");
 const validateMongoDbId = require("../helpers/validateMongodbId");
 
-const createCategory = asyncHandler(async (req, res) => {
-	try {
-		const newCategory = await Category.create(req.body);
-		res.json(newCategory);
-	} catch (error) {
-		throw new Error(error);
+const createCategory = async (req, res) => {
+	const { title } = req.body;
+	if (!title) {
+		return res.status(422).json({ error: "الاسم مطلوب" });
 	}
-});
-const updateCategory = asyncHandler(async (req, res) => {
+	const categoryFound = await Category.find({ title });
+
+	if (categoryFound.length > 0) {
+		return res.status(422).json({ error: "القسم موجود بالفعل" });
+	}
+	try {
+		const newCategory = await new Category({ title }).save();
+		res.status(200).json({ message: "تم اضافة القسم بنجاح" });
+	} catch (error) {
+		res.status(500).json({ error: error.message });
+	}
+};
+const updateCategory = async (req, res) => {
 	const { id } = req.params;
+	const { title } = req.body;
 	validateMongoDbId(id);
-	try {
-		const updatedCategory = await Category.findByIdAndUpdate(id, req.body, {
-			new: true,
-		});
-		res.json(updatedCategory);
-	} catch (error) {
-		throw new Error(error);
+	if (!title) {
+		return res.status(422).json({ error: "الاسم مطلوب" });
 	}
-});
-const deleteCategory = asyncHandler(async (req, res) => {
-	const { id } = req.params;
-	validateMongoDbId(id);
 	try {
-		const deletedCategory = await Category.findByIdAndDelete(id);
-		res.json(deletedCategory);
+		await Category.findByIdAndUpdate(
+			id,
+			{ title },
+			{
+				new: true,
+				runValidators: true,
+			}
+		);
+		res.status(200).json({ message: "تم تعديل القسم بنجاح" });
 	} catch (error) {
-		throw new Error(error);
+		res.status(500).json({ error: error.message });
 	}
-});
+};
+const deleteCategory = async (req, res) => {
+	const { id } = req.body;
+	try {
+		validateMongoDbId(id);
+		await Category.findByIdAndDelete({_id: id});
+		res.status(200).json({ message: "تم حذف العلامة التجارية بنجاح" });
+	} catch (error) {
+		res.status(500).json({ error: error.message });
+	}
+};
+
 const getCategory = asyncHandler(async (req, res) => {
 	const { id } = req.params;
 	validateMongoDbId(id);
@@ -42,14 +61,16 @@ const getCategory = asyncHandler(async (req, res) => {
 		throw new Error(error);
 	}
 });
-const getallCategory = asyncHandler(async (req, res) => {
+
+const getallCategory = async (req, res) => {
 	try {
-		const getallCategory = await Category.find();
-		res.json(getallCategory);
+		const allCategory = await Category.find();
+		res.status(200).json(allCategory);
 	} catch (error) {
-		throw new Error(error);
+		res.status(500).json({ error: error.message });
 	}
-});
+};
+
 module.exports = {
 	createCategory,
 	updateCategory,

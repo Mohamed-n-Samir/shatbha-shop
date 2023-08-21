@@ -7,8 +7,8 @@ const addCity = asyncHandler(async (req, res) => {
 	try {
         if(!name) throw new Error("City Name is required");
         if(name.length < 3) throw new Error("City Name must be at least 3 characters long");
-        if(!shippingCharge) throw new Error("Shipping Charge is required");
-        if(shippingCharge <= 0) throw new Error("Shipping Charge must be greater than 0 or equal to 0");
+        if(!shippingCharge && shippingCharge!== 0) throw new Error("Shipping Charge is required");
+        if(shippingCharge < 0) throw new Error("Shipping Charge must be greater or equal to 0");
 		const newCity = await new City({
             name,
             shippingCharge

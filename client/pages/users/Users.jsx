@@ -1,7 +1,6 @@
 import NavBar from "../../src/AdminComponents/NavBar/NavBar";
 import SideBar from "../../src/AdminComponents/SideBar/SideBar";
-// import ShowUsersTable from "../../src/AdminComponents/UsersTable/UserTable";
-
+import ShowUsersTable from "../../src/AdminComponents/UsersTable/UsersTable"
 import "./users.css";
 
 const Users = () => {
@@ -10,7 +9,7 @@ const Users = () => {
 			<SideBar />
 			<div className="users-table-container">
 				<NavBar />
-				{/* <ShowUsersTable /> */}
+				<ShowUsersTable />
 			</div>
 		</div>
 	);

@@ -9,11 +9,11 @@ const {
 const { authMiddleware, isAdmin } = require("../middleware/authMiddleware");
 const router = express.Router();
 
-router.route("/").post(authMiddleware, isAdmin, createCategory);
-router.route("/:id").put(authMiddleware, isAdmin, updateCategory);
-router.route("/:id").delete(authMiddleware, isAdmin, deleteCategory);
+router.route("/api/createCategory").post(isAdmin, createCategory);
+router.route("/api/updateCategory/:id").patch(isAdmin, updateCategory);
+router.route("/api/deleteCategory").delete(isAdmin, deleteCategory);
 router.route("/:id").get(getCategory);
-router.route("/").get(getallCategory);
+router.route("/api/allCategory").get(getallCategory);
 
 
 

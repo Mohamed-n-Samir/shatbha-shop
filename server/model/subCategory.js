@@ -9,7 +9,7 @@ var subCategorySchema = new mongoose.Schema(
             ref: "PCategory",
         },
         subCategory: {
-            type: [string],
+            type: [String],
         }
     },
 	{

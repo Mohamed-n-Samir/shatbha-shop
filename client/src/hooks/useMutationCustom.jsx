@@ -12,6 +12,8 @@ const useMutationCustom = (config = {}) => {
 					return await axios.put(`${import.meta.env.VITE_REACT_BACKEND_URL}/${path}`, data);
 				case "delete":
 					return await axios.delete(`${import.meta.env.VITE_REACT_BACKEND_URL}/${path}`, data);
+				case "patch":
+					return await axios.patch(`${import.meta.env.VITE_REACT_BACKEND_URL}/${path}`, data);
 				default:
 					return await axios.post(`${import.meta.env.VITE_REACT_BACKEND_URL}/${path}`,data);
 			}

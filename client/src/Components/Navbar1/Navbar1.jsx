@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useMediaQuery } from "react-responsive";
 import { NavLink, useLocation, Link } from "react-router-dom";
 import DropDown from "../DropDown/DropDown";
-import { ReactComponent as SearchIcon } from "../../assets/icons/searchIcon.svg";
+import Search from "../Search/Search";
 import { ReactComponent as Cart } from "../../assets/icons/cart.svg";
 import "./navbar1.css";
 
@@ -15,7 +15,7 @@ const Navbar1 = () => {
 
 	const { pathname } = useLocation();
 	const isActive = ["/", "/home"].includes(pathname);
-	const [hovered, setHovered] = useState(false);
+
 	const [clicked, setClicked] = useState(false);
 	// const { logout, loading } = useLogout();
 	// if (loading) {
@@ -70,7 +70,7 @@ const Navbar1 = () => {
 						</li>
 						<li className="link">
 							<NavLink
-								to="/store"
+								to="/products"
 								className={({ isActive }) =>
 									isActive ? activeStyle : undefined
 								}
@@ -106,30 +106,8 @@ const Navbar1 = () => {
 							</NavLink>
 						</li>
 					</ul>
-					<form className="d-flex search-form">
-						<input
-							className="form-control form-control-lg ms-2 search-input"
-							type="search"
-							placeholder="بحث عن المنتجات"
-							aria-label="Search"
-						/>
-						<button
-							className="btn btn-outline-dark p-3"
-							type="submit"
-							onMouseEnter={() => {
-								setHovered(true);
-							}}
-							onMouseLeave={() => {
-								setHovered(false);
-							}}
-						>
-							<SearchIcon
-								style={{
-									fill: hovered ? "var(--white-color)" : "",
-								}}
-							/>
-						</button>
-					</form>
+					<Search/>
+
 				</div>
 			</nav>
 		</>

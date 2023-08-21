@@ -1,0 +1,29 @@
+.card2 {
+    padding-bottom: 2rem ;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    border-radius: .7rem;
+    transition: all .3s ease-in-out;
+    min-height: 62rem;
+}
+
+.card2:hover {
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+}
+
+.card2 a {
+    text-decoration: none ;
+    color: var(--black-color) ;
+}
+
+.card2 p {
+    font-size: 1.4rem;
+    font-weight: 400;
+    color: #000;
+    margin-bottom: 1rem;
+}
+
+.old-price {
+    text-decoration: line-through;
+    color: #999;
+    font-weight: 400;
+}

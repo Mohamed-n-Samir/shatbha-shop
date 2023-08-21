@@ -4,44 +4,115 @@ const asyncHandler = require("express-async-handler");
 const slugify = require("slugify");
 const validateMongoDbId = require("../helpers/validateMongodbId");
 
-const createProduct = asyncHandler(async (req, res) => {
+const createProduct = async (req, res) => {
+	const {
+		title,
+		description,
+		oldPrice,
+		category,
+		brand,
+		quantity,
+		images,
+		tags,
+	} = req.body;
 	try {
-		if (req.body.title) {
-			req.body.slug = slugify(req.body.title);
-		}
-		const newProduct = await Product.create(req.body);
-		res.json(newProduct);
-	} catch (error) {
-		throw new Error(error);
-	}
-});
+		if (!title) return res.status(422).json({ error: "العنوان مطلوب" });
+		if (title.length < 3)
+			return res
+				.status(422)
+				.json({ error: "العنوان يجب ان يكون اطول من ثلاث حروف" });
+		if (!description) return res.status(422).json({ error: "الوصف مطلوب" });
+		if (description.length < 10)
+			return res
+				.status(422)
+				.json({ error: "الوصف يجب ان يكون اطول من عشرة حروف" });
+		if (!oldPrice) return res.status(422).json({ error: "السعر مطلوب" });
+		if (oldPrice < 0)
+			return res
+				.status(422)
+				.json({ error: "السعر يجب ان يكون اكبر من صفر" });
+		if (!category) return res.status(422).json({ error: "القسم مطلوب" });
+		if (validateMongoDbId(category))
+			return res.status(422).json({ error: "القسم غير صحيح" });
+		if (!quantity) return res.status(422).json({ error: "الكميه مطلوبه" });
+		if (quantity < 0)
+			return res
+				.status(422)
+				.json({ error: "الكميه يجب ان تكون اكبر من الصفر" });
+		if (!images) return res.status(422).json({ error: "الصور مطلوبه" });
+		if (images.length < 1)
+			return res
+				.status(422)
+				.json({ error: "يجب ان تكون هناك صورة واحدة على الاقل" });
 
-const updateProduct = asyncHandler(async (req, res) => {
-	const id = req.params;
-	validateMongoDbId(id);
-	try {
-		if (req.body.title) {
-			req.body.slug = slugify(req.body.title);
-		}
-		const updateProduct = await Product.findOneAndUpdate({ id }, req.body, {
-			new: true,
+		images.forEach((image) => {
+			if (!image.url)
+				return res.status(422).json({ error: "الصورة مطلوبه" });
+			else if (
+				!image?.url?.match(
+					/^(http(s?):)\/\/.*\.(?:jpg|jpeg|gif|png|svg|webp|JPG|JPEG|GIF|PNG|SVG|WEBP)$/
+				)
+			)
+				return res.status(422).json({ error: "الصورة غير صحيحه" });
 		});
-		res.json(updateProduct);
-	} catch (error) {
-		throw new Error(error);
-	}
-});
 
-const deleteProduct = asyncHandler(async (req, res) => {
-	const id = req.params;
-	validateMongoDbId(id);
-	try {
-		const deleteProduct = await Product.findOneAndDelete(id);
-		res.json(deleteProduct);
+		if (!tags) return res.status(422).json({ error: "التاج مطلوب" });
+		if (tags.length < 1)
+			return res
+				.status(422)
+				.json({ error: "يجب ان يكون هناك تاج واحد على الاقل" });
+
+		const slug = title ? slugify(title) : null;
+		const newProduct = await new Product({
+			title,
+			slug,
+			description,
+			oldPrice,
+			newPrice: oldPrice,
+			category,
+			brand: brand === "" ? null : brand,
+			quantity,
+			images,
+			tags,
+		}).save();
+		return res.status(201).json({ message: "تم اضافه المنتج بنجاح" });
 	} catch (error) {
-		throw new Error(error);
+		return res.status(500).json({ error: error.message });
 	}
-});
+};
+
+const updateProduct = async (req, res) => {
+	const { id } = req.params;
+	const data = req.body;
+	// validateMongoDbId(id);
+
+	try {
+		const updateProduct = await Product.findByIdAndUpdate(
+			{ _id: id },
+			data,
+			{
+				new: true,
+				runValidators: true,
+			}
+		);
+		console.log(updateProduct);
+		res.status(200).json({ message: "تم تعديل المنتج بنجاح" });
+	} catch (error) {
+		res.status(500).json({ error: error.message });
+	}
+};
+
+const deleteProduct = async (req, res) => {
+	const { id } = req.body;
+	validateMongoDbId(id);
+	console.log(id);
+	try {
+		const deleteProduct = await Product.findOneAndDelete({ _id: id });
+		res.status(200).json({ message: "تم حذف المنتج بنجاح" });
+	} catch (error) {
+		res.status(500).json({ error: error.message });
+	}
+};
 
 const getaProduct = asyncHandler(async (req, res) => {
 	const { id } = req.params;
@@ -56,17 +127,40 @@ const getaProduct = asyncHandler(async (req, res) => {
 
 const getAllProduct = asyncHandler(async (req, res) => {
 	try {
+		const allProduct = await Product.find({})
+			.populate("category")
+			.populate("brand")
+			.sort({ createdAt: -1 });
+		res.json(allProduct);
+	} catch (error) {
+		throw new Error(error);
+	}
+});
+
+const getAllProduct1 = async (req, res) => {
+	try {
 		// Filtering
 		const queryObj = { ...req.query };
 		const excludeFields = ["page", "sort", "limit", "fields"];
-		excludeFields.forEach((el) => delete queryObj[el]);
-		let queryStr = JSON.stringify(queryObj);
-		queryStr = queryStr.replace(
-			/\b(gte|gt|lte|lt)\b/g,
-			(match) => `$${match}`
-		);
+		let queryStr;
+		let query;
+		if (queryObj) {
+			excludeFields.forEach((el) => delete queryObj[el]);
+			queryStr = JSON.stringify(queryObj);
+			queryStr = queryStr.replace(
+				/\b(gte|gt|lte|lt)\b/g,
+				(match) => `$${match}`
+			);
 
-		let query = Product.find(JSON.parse(queryStr));
+			if (req.query.title) {
+				query = Product.find({
+					...JSON.parse(queryStr),
+					title: new RegExp(req.query.title, "i"),
+				}).populate("category");
+			} else {
+				query = Product.find(JSON.parse(queryStr)).populate("category");
+			}
+		}
 
 		// Sorting
 
@@ -86,24 +180,35 @@ const getAllProduct = asyncHandler(async (req, res) => {
 			query = query.select("-__v");
 		}
 
+		const productCount = await Product.find(query).countDocuments();
+
 		// pagination
 
-		const page = req.query.page;
-		const limit = req.query.limit;
+		// let productCount = 12
+
+		const page = req.query.page || 1;
+		const limit = req.query.limit || 5;
 		const skip = (page - 1) * limit;
 		query = query.skip(skip).limit(limit);
-		if (req.query.page) {
-			const productCount = await Product.countDocuments();
-			if (skip >= productCount)
-				throw new Error("This Page does not exists");
-		}
-		const product = await query;
-		res.json(product);
-	} catch (error) {
-		throw new Error(error);
-	}
-});
 
+		console.log("halawa");
+
+		if (skip >= productCount && page > 1)
+			return res.status(404).json({ message: "هذه الصفحه غير موجوده" });
+
+		const products = await query;
+		// console.log(products.length);
+		res.status(200).json({
+			products: {
+				productCount,
+				products,
+			},
+		});
+	} catch (error) {
+		console.log(error);
+		return res.status(500).json({ error: error.message });
+	}
+};
 
 const addToWishlist = asyncHandler(async (req, res) => {
 	const { _id } = req.user;
@@ -200,6 +305,20 @@ const rating = asyncHandler(async (req, res) => {
 	}
 });
 
+const getOffers = async (req, res) => {
+	try {
+		const offers = await Product.find({ newPrice: { $gt: 0 } })
+			.populate("category")
+			.populate("brand")
+			.limit(4);
+		return res.status(200).json({ offers });
+	} catch (error) {
+		console.log("halawatayn");
+		console.log(error.message);
+		return res.status(500).json({ error: error.message });
+	}
+};
+
 module.exports = {
 	createProduct,
 	getaProduct,
@@ -208,4 +327,6 @@ module.exports = {
 	deleteProduct,
 	addToWishlist,
 	rating,
+	getOffers,
+	getAllProduct1,
 };

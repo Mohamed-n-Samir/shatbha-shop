@@ -1,14 +1,14 @@
-/* eslint-disable no-mixed-spaces-and-tabs */
 import { useMemo, useState, useCallback } from "react";
 import { MaterialReactTable } from "material-react-table";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import useQueryCustom from "../../hooks/useQueryCustom";
+import useMutationCustom from "../../hooks/useMutationCustom";
+import { useQueryClient } from "@tanstack/react-query";
 import "./users-table.css";
-import { Block, Edit } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import {
 	Box,
-	// Button,
+	Button,
 	// Dialog,
 	// DialogActions,
 	// DialogContent,
@@ -19,14 +19,13 @@ import {
 	// TextField,
 	Tooltip,
 } from "@mui/material";
+import { toast } from "react-toastify";
 
 const UsersTable = () => {
 	const [columnFilters, setColumnFilters] = useState([]);
 	const [globalFilter, setGlobalFilter] = useState("");
 	const [sorting, setSorting] = useState([]);
-	// const [createModalOpen, setCreateModalOpen] = useState(false);
-	const [validationErrors, setValidationErrors] = useState({});
-
+	const queryClient = useQueryClient();
 	const { data, isError, isFetching, isLoading, refetch } = useQueryCustom(
 		["users-table-data"],
 		"/allUsers",
@@ -37,6 +36,36 @@ const UsersTable = () => {
 		}
 	);
 
+	const { data: cityData, isLoading: isLoadingCity } = useQueryCustom(
+		["city-data"],
+		"/getAllCities",
+		{
+			refetchOnMount: false,
+			refetchOnWindowFocus: false,
+			keepPreviousData: true,
+		}
+	);
+
+	const { mutate, isLoading: mutationLoading } = useMutationCustom({
+		onSuccess: (data) => {
+			console.log(data);
+			if (data) {
+				console.log(data);
+				toast.success(data.data.message, {
+					position: "top-center",
+					autoClose: 5000,
+					hideProgressBar: false,
+					closeOnClick: true,
+					pauseOnHover: true,
+					draggable: true,
+					progress: undefined,
+					theme: "dark",
+				});
+				queryClient.invalidateQueries("users-table-data");
+			}
+		},
+	});
+
 	const [tableData, setTableData] = useState(() => data);
 
 	// const handleCreateNewRow = (values) => {
@@ -44,70 +73,248 @@ const UsersTable = () => {
 	// 	setTableData([...tableData]);
 	// };
 
-	const handleSaveRowEdits = async ({ exitEditingMode, row, values }) => {
-		if (!Object.keys(validationErrors).length) {
-			tableData[row.index] = values;
-			//send/receive api updates here, then refetch or update local table data for re-render
-			setTableData([...tableData]);
-			exitEditingMode(); //required to exit editing mode and close modal
-		}
-	};
-
 	const navigate = useNavigate();
 
-	const handleCancelRowEdits = () => {
-		setValidationErrors({});
+	const handleSaveCell = async (cell, value) => {
+		switch (cell.column.id) {
+			case "fullname":
+				if (!value) {
+					toast.error("الرجاء ادخال الاسم الكامل", {
+						position: "top-center",
+						autoClose: 5000,
+						hideProgressBar: false,
+						closeOnClick: true,
+						pauseOnHover: true,
+						draggable: true,
+						progress: undefined,
+					});
+					return;
+				} else if (
+					!(
+						value.split(" ").length === 2 &&
+						value.split(" ")[0].length > 2 &&
+						value.split(" ")[1].length > 2
+					)
+				) {
+					toast.error(
+						"يجب ان يتكون من اسمين و يكون كل اسم يزيد عن حرفين",
+						{
+							position: "top-center",
+							autoClose: 5000,
+							hideProgressBar: false,
+							closeOnClick: true,
+							pauseOnHover: true,
+							draggable: true,
+							progress: undefined,
+						}
+					);
+					return;
+				} else {
+					mutate([
+						`updateUser-admin/${cell.row.original._id}`,
+						{
+							firstname: value.split(" ")[0],
+							lastname: value.split(" ")[1],
+						},
+						"patch",
+					]);
+				}
+				break;
+			case "email":
+				if (!value) {
+					toast.error("الرجاء ادخال البريد الالكتروني", {
+						position: "top-center",
+						autoClose: 5000,
+						hideProgressBar: false,
+						closeOnClick: true,
+						pauseOnHover: true,
+						draggable: true,
+						progress: undefined,
+					});
+					return;
+				} else if (
+					!value.match(
+						/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+					)
+				) {
+					toast.error("الرجاء ادخال البريد الالكتروني بشكل صحيح", {
+						position: "top-center",
+						autoClose: 5000,
+						hideProgressBar: false,
+						closeOnClick: true,
+						pauseOnHover: true,
+						draggable: true,
+						progress: undefined,
+					});
+					return;
+				} else {
+					mutate([
+						`updateUser-admin/${cell.row.original._id}`,
+						{
+							email: value.toLowerCase(),
+						},
+						"patch",
+					]);
+				}
+				break;
+			case "mobile":
+				if (!value) {
+					toast.error("الرجاء ادخال رقم الجوال", {
+						position: "top-center",
+						autoClose: 5000,
+						hideProgressBar: false,
+						closeOnClick: true,
+						pauseOnHover: true,
+						draggable: true,
+						progress: undefined,
+					});
+					return;
+				} else if (!value.match(/^01[0125][0-9]{8}$/gm)) {
+					toast.error("الرجاء ادخال رقم الجوال بشكل صحيح", {
+						position: "top-center",
+						autoClose: 5000,
+						hideProgressBar: false,
+						closeOnClick: true,
+						pauseOnHover: true,
+						draggable: true,
+						progress: undefined,
+					});
+					return;
+				} else {
+					mutate([
+						`updateUser-admin/${cell.row.original._id}`,
+						{
+							mobile: value,
+						},
+						"patch",
+					]);
+				}
+				break;
+			case "city":
+				console.log(value);
+				if (!value) {
+					toast.error("الرجاء ادخال المدينة", {
+						position: "top-center",
+						autoClose: 5000,
+						hideProgressBar: false,
+						closeOnClick: true,
+						pauseOnHover: true,
+						draggable: true,
+						progress: undefined,
+					});
+					return;
+				} else {
+					mutate([
+						`updateUser-admin/${cell.row.original._id}`,
+						{
+							city: value,
+						},
+						"patch",
+					]);
+				}
+				break;
+			case "area":
+				if (!value) {
+					toast.error("الرجاء ادخال المنطقه", {
+						position: "top-center",
+						autoClose: 5000,
+						hideProgressBar: false,
+						closeOnClick: true,
+						pauseOnHover: true,
+						draggable: true,
+						progress: undefined,
+					});
+
+					return;
+				} else {
+					mutate([
+						`updateUser-admin/${cell.row.original._id}`,
+						{
+							area: value,
+						},
+						"patch",
+					]);
+				}
+				break;
+			case "buildingAndApartment":
+				if (!value) {
+					toast.error("الرجاء ادخال رقم العمارة و الشقة", {
+						position: "top-center",
+						autoClose: 5000,
+						hideProgressBar: false,
+						closeOnClick: true,
+						pauseOnHover: true,
+						draggable: true,
+						progress: undefined,
+					});
+
+					return;
+				} else {
+					mutate([
+						`updateUser-admin/${cell.row.original._id}`,
+						{
+							buildingAndApartment: value,
+						},
+						"patch",
+					]);
+				}
+				break;
+			case "gender":
+				if (!value) {
+					toast.error("الرجاء ادخال الجنس", {
+						position: "top-center",
+						autoClose: 5000,
+						hideProgressBar: false,
+						closeOnClick: true,
+						pauseOnHover: true,
+						draggable: true,
+						progress: undefined,
+					});
+
+					return;
+				} else {
+					mutate([
+						`updateUser-admin/${cell.row.original._id}`,
+						{
+							gender: value,
+						},
+						"patch",
+					]);
+				}
+				break;
+			case "isBlocked":
+				if (!value) {
+					toast.error("الرجاء ادخال حالة الحظر", {
+						position: "top-center",
+						autoClose: 5000,
+						hideProgressBar: false,
+						closeOnClick: true,
+						pauseOnHover: true,
+						draggable: true,
+						progress: undefined,
+					});
+
+					return;
+				} else {
+					mutate([
+						`updateUser-admin/${cell.row.original._id}`,
+						{
+							isBlocked: value,
+						},
+						"patch",
+					]);
+				}
+				break;
+
+			default:
+				break;
+		}
+
+		console.log(value);
 	};
 
-	const handleDeleteRow = useCallback(
-		(row) => {
-			if (
-				!confirm(
-					`Are you sure you want to Suspend ${row.getValue("_id")}`
-				)
-			) {
-				return;
-			}
-			//send api delete request here, then refetch or update local table data for re-render
-			tableData.splice(row.index, 1);
-			setTableData([...tableData]);
-		},
-		[tableData]
-	);
-
-	const getCommonEditTextFieldProps = useCallback(
-		(cell) => {
-			return {
-				error: !!validationErrors[cell.id],
-				helperText: validationErrors[cell.id],
-				onBlur: (event) => {
-					const isValid =
-						cell.column.id === "email"
-							? validateEmail(event.target.value)
-							: cell.column.id === "age"
-							? validateAge(+event.target.value)
-							: validateRequired(event.target.value);
-					if (!isValid) {
-						//set validation error for cell if invalid
-						setValidationErrors({
-							...validationErrors,
-							[cell.id]: `${cell.column.columnDef.header} is required`,
-						});
-					} else {
-						//remove validation error for cell if valid
-						delete validationErrors[cell.id];
-						setValidationErrors({
-							...validationErrors,
-						});
-					}
-				},
-			};
-		},
-		[validationErrors]
-	);
-
-	const columns = useMemo(
-		() => [
+	const columns = useMemo(() => {
+		return [
 			{
 				accessorKey: "_id",
 				header: "ID",
@@ -117,59 +324,63 @@ const UsersTable = () => {
 				size: 150,
 			},
 			{
-				accessorKey: "fullName",
-				header: "Full Name",
-				muiTableBodyCellEditTextFieldProps: ({ cell }) => ({
-					...getCommonEditTextFieldProps(cell),
-				}),
+				accessorFn: (row) => `${row.firstname} ${row.lastname}`.trim(),
+				header: "الاسم الكامل",
+				id: "fullname",
+				size: 130,
 			},
 			{
-				accessorKey: "username",
-				header: "Username",
-				muiTableBodyCellEditTextFieldProps: ({ cell }) => ({
-					...getCommonEditTextFieldProps(cell),
-				}),
+				accessorKey: "role",
+				header: "الدور",
+				size: 100,
 				enableEditing: false,
 			},
 			{
 				accessorKey: "email",
-				header: "Email",
-				muiTableBodyCellEditTextFieldProps: ({ cell }) => ({
-					...getCommonEditTextFieldProps(cell),
-				}),
+				header: "البريد الالكتروني",
 				type: "email",
+				size: 200,
 			},
 			{
-				accessorKey: "dadNumber",
-				header: "Dad Number",
-				muiTableBodyCellEditTextFieldProps: ({ cell }) => ({
-					...getCommonEditTextFieldProps(cell),
-				}),
+				accessorKey: "mobile",
+				header: "الهاتف",
+				size: 130,
 			},
 			{
-				accessorKey: "callNumber",
-				header: "Call Number",
-				muiTableBodyCellEditTextFieldProps: ({ cell }) => ({
-					...getCommonEditTextFieldProps(cell),
-				}),
-			},
-			{
-				accessorKey: "mumNumber",
-				header: "Mum Number",
-				muiTableBodyCellEditTextFieldProps: ({ cell }) => ({
-					...getCommonEditTextFieldProps(cell),
-				}),
-			},
-			{
-				accessorKey: "city",
-				header: "City",
-				muiTableBodyCellEditTextFieldProps: ({ cell }) => ({
-					...getCommonEditTextFieldProps(cell),
-				}),
+				accessorFn: (row) => {
+					if (cityData?.data) {
+						return row?.city?.name?.trim();
+					}
+				},
+				id: "city",
+				header: "المدينة",
+				size: 130,
+				enableEditing: true,
+				muiTableBodyCellEditTextFieldProps: {
+					select: true, //change to select for a dropdown
+					children: cityData?.data ? (
+						cityData?.data?.map((city) => {
+							return (
+								city.name !== "Admin" && (
+									<MenuItem
+										key={city?.name}
+										value={city?._id.trim()}
+									>
+										{(city?.name).trim()}
+									</MenuItem>
+								)
+							);
+						})
+					) : (
+						<MenuItem key={0} value={""}>
+							{"No Cities"}
+						</MenuItem>
+					),
+				},
 			},
 			{
 				accessorKey: "gender",
-				header: "Gender",
+				header: "الجنس",
 				muiTableBodyCellEditTextFieldProps: {
 					select: true, //change to select for a dropdown
 					children: [
@@ -181,27 +392,7 @@ const UsersTable = () => {
 						</MenuItem>,
 					],
 				},
-			},
-			{
-				accessorFn: (row) => {
-					const formatedDate = new Date(row.lastseen);
-					return formatedDate.toLocaleDateString("en-US", {
-						year: "numeric",
-						month: "2-digit",
-						day: "2-digit",
-						hour: "2-digit",
-						minute: "2-digit",
-						second: "2-digit",
-						hour12: false,
-					});
-				},
-				id: "lastseen",
-				header: "Last Seen",
-				muiTableBodyCellEditTextFieldProps: ({ cell }) => ({
-					...getCommonEditTextFieldProps(cell),
-				}),
-				type: "date",
-				enableEditing: false,
+				size: 130,
 			},
 			{
 				accessorFn: (row) => {
@@ -218,29 +409,68 @@ const UsersTable = () => {
 				},
 				id: "createdAt",
 				header: "Created At",
-				muiTableBodyCellEditTextFieldProps: ({ cell }) => ({
-					...getCommonEditTextFieldProps(cell),
-				}),
 				enableEditing: false,
 			},
 			{
 				accessorKey: "updatedAt",
 				header: "Updated At",
 				type: "date",
-				muiTableBodyCellEditTextFieldProps: ({ cell }) => ({
-					...getCommonEditTextFieldProps(cell),
-				}),
 				enableEditing: false,
 			},
 			{
-				accessorKey: "cash",
-				header: "Cash",
-				enableEditing: false,
+				accessorKey: "area",
+				header: "المنطقة",
+				enableEditing: true,
+				size: 130,
 			},
 			{
-				accessorFn: (row) => (row.suspended ? "true" : "false"),
-				id: "suspended",
-				header: "Suspended",
+				accessorKey: "buildingAndApartment",
+				header: "المبنى والشقة",
+				enableEditing: true,
+				size: 140,
+			},
+			{
+				accessorKey: "wishlist",
+				header: "المفضلة",
+				enableEditing: false,
+				size: 130,
+				Cell: ({ cell }) => {
+					return (
+						<Button
+							variant="contained"
+							className="btn btn-dark fs-5"
+							onClick={() => {
+								navigate(`/wishlist/${cell.getValue()}`);
+							}}
+						>
+							شاهد المفضله
+						</Button>
+					);
+				},
+			},
+			{
+				accessorKey: "cart",
+				header: "عربه التسوق",
+				enableEditing: false,
+				size: 130,
+				Cell: ({ cell }) => {
+					return (
+						<Button
+							variant="contained"
+							className="fs-5 w-100"
+							onClick={() => {
+								navigate(`/cart/${cell.getValue()}`);
+							}}
+						>
+							شاهد العربه
+						</Button>
+					);
+				},
+			},
+			{
+				accessorFn: (row) => (row.isBlocked ? "true" : "false"),
+				id: "isBlocked",
+				header: "محظور",
 				muiTableBodyCellEditTextFieldProps: {
 					select: true, //change to select for a dropdown
 					children: [
@@ -253,25 +483,18 @@ const UsersTable = () => {
 					],
 				},
 				type: "boolean",
+				size: 130,
 			},
-			{
-				accessorKey: "facebookProfile",
-				header: "Facebook",
-				muiTableBodyCellEditTextFieldProps: ({ cell }) => ({
-					...getCommonEditTextFieldProps(cell),
-				}),
-			},
-		],
-		[getCommonEditTextFieldProps]
-	);
+		];
+	}, [cityData?.data]);
 
 	return (
-		<div className="users-table ">
+		<div className="users-table p-4 fs-3">
 			<MaterialReactTable
 				muiTableBodyRowProps={({ row }) => ({
-					onDoubleClick: (event) => {
+					onDragEnd: (event) => {
 						console.info(event, row.getValue("_id"));
-						navigate(`/users/${row.getValue("_id")}`, {
+						navigate(`/dashboard/user/${row.getValue("_id")}`, {
 							state: { id: row.getValue("_id") },
 						});
 					},
@@ -279,13 +502,37 @@ const UsersTable = () => {
 						cursor: "pointer",
 					},
 				})}
+				enableRowDrag
 				enableColumnResizing
+				enableEditing
+				editingMode="cell"
+				muiTableBodyCellEditTextFieldProps={({ cell }) => ({
+					onBlur: (event) => {
+						console.log(event.target);
+						handleSaveCell(cell, event.target.value);
+					},
+				})}
 				displayColumnDefOptions={{
 					"mrt-row-actions": {
 						muiTableHeadCellProps: {
 							align: "center",
 						},
-						size: 120,
+						size: 100,
+					},
+				}}
+				muiTableHeadCellProps={{
+					sx: {
+						fontSize: "1.5rem",
+						"& span": {
+							display: "flex",
+							justifyContent: "center",
+						},
+					},
+				}}
+				muiTableBodyCellProps={{
+					sx: {
+						textAlign: "right",
+						fontSize: "1.1rem",
 					},
 				}}
 				columns={columns}
@@ -293,15 +540,12 @@ const UsersTable = () => {
 				initialState={{
 					showColumnFilters: true,
 					columnVisibility: {
-						facebookProfile: false,
-						updatedAt: false,
+						isBlocked: false,
 						createdAt: false,
-						gender: false,
-						city: false,
+						updatedAt: false,
+						role: false,
+						wishlist: false,
 						_id: false,
-						username: false,
-						lastseen: false,
-						cash: false,
 					},
 				}}
 				muiToolbarAlertBannerProps={
@@ -316,64 +560,33 @@ const UsersTable = () => {
 				onGlobalFilterChange={setGlobalFilter}
 				onSortingChange={setSorting}
 				renderTopToolbarCustomActions={() => (
-					<Tooltip arrow title="Refresh Data">
-						<IconButton onClick={() => refetch()}>
-							<RefreshIcon />
-						</IconButton>
-					</Tooltip>
+					<div>
+						<Tooltip arrow title="اعاده احضار البيانات">
+							<IconButton onClick={() => refetch()}>
+								<RefreshIcon />
+							</IconButton>
+						</Tooltip>
+					</div>
 				)}
 				state={{
 					columnFilters,
 					globalFilter,
-					isLoading,
+					isLoading: isLoading && isLoadingCity,
 					showAlertBanner: isError,
 					showProgressBars: isFetching,
 					sorting,
 				}}
 				enablePagination={true}
 				muiTablePaginationProps={{
-					rowsPerPageOptions: [5, 10],
+					rowsPerPageOptions: [5, 10, 15],
 					showFirstButton: true,
 					showLastButton: true,
 				}}
-				editingMode="modal" //default
 				enableColumnOrdering
-				enableEditing
-				onEditingRowSave={handleSaveRowEdits}
-				onEditingRowCancel={handleCancelRowEdits}
-				renderRowActions={({ row, table }) => (
-					<Box sx={{ display: "flex", gap: "1rem" }}>
-						<Tooltip arrow placement="left" title="Edit">
-							<IconButton
-								onClick={() => table.setEditingRow(row)}
-							>
-								<Edit />
-							</IconButton>
-						</Tooltip>
-						<Tooltip arrow placement="right" title="Delete">
-							<IconButton
-								color="error"
-								onClick={() => handleDeleteRow(row)}
-							>
-								<Block />
-							</IconButton>
-						</Tooltip>
-					</Box>
-				)}
 			/>
 		</div>
 	);
 };
-
-const validateRequired = (value) => !!value.length;
-const validateEmail = (email) =>
-	!!email.length &&
-	email
-		.toLowerCase()
-		.match(
-			/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-		);
-const validateAge = (age) => age >= 18 && age <= 50;
 
 const ShowUsersTable = () => <UsersTable />;
 

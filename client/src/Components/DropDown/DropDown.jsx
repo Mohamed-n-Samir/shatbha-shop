@@ -33,18 +33,18 @@ const DropDown = () => {
 			>
 				{user.role === "admin" && (
 					<li className="drop-down-item">
-						<Link className="dropdown-item" to="dashboard">
+						<Link className="dropdown-item" to="/dashboard">
 							لوحة التحكم
 						</Link>
 					</li>
 				)}
 				<li className="drop-down-item">
-					<Link className="dropdown-item" to="orders">
+					<Link className="dropdown-item" to="/orders">
 						الطلبات
 					</Link>
 				</li>
 				<li className="drop-down-item">
-					<Link className="dropdown-item" to="wishlist">
+					<Link className="dropdown-item" to="/wishlist">
 						منتجاتي المفضله
 					</Link>
 				</li>

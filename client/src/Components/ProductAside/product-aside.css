@@ -1,0 +1,99 @@
+.product-aside {
+	flex: 1.5;
+	/* border-left: 1px solid var(--black-color); */
+	padding: 1rem;
+
+}
+
+.app {
+	width: 100%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	/* padding: 4rem 0; */
+}
+
+.box {
+	width: 100%;
+	padding: 3.6rem 3.2rem;
+	background-color: var(--white-color);
+	border-radius: 1rem;
+	box-shadow: 0 0.4rem 1.2rem rgba(0, 0, 0, 0.1);
+}
+
+.box h3 {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin: 0 0 2rem 0;
+	color: var(--black-color);
+}
+
+.box h3 span {
+	font-weight: 500;
+	color: var(--text2-color);
+}
+
+.box .values {
+	margin: 0;
+	font-weight: 500;
+	color: #275efe;
+	font-size: 1.4rem;
+}
+
+.box small {
+	font-size: 1.4rem;
+	margin-top: 0.8rem;
+	display: block;
+	color: #99a3ba;
+}
+
+.box .slider {
+	width: 100%;
+	height: .6rem;
+	background-color: #cdd9ed;
+}
+
+.box .slider .thumb {
+	width: 2.3rem;
+	height: 2.3rem;
+	cursor: grab;
+	background-color: var(--white-color);
+	border-radius: 50%;
+	box-shadow: 0 0.4rem 1.2rem rgba(0, 0, 0, 0.1);
+	border: 0.2rem solid var(--black-color);
+	margin-top: 2rem;
+    top: -2.7rem;
+}
+
+.box .slider-container {
+    padding: 1.5rem 0;
+}
+
+.main-ul li {
+    font-size: 1.8rem;
+    color: var(--primary-color);
+    padding: 1rem 0;
+}
+
+.main-ul li a {
+    text-decoration: none;
+}
+
+.main-ul li a:hover {
+    color: var(--black-color)
+}
+
+.main-ul .inner-ul li{
+    padding: .5rem 0;
+    margin-right: 3rem;
+
+
+
+}
+
+.main-ul .inner-ul li::before{
+    content: "\00BB";
+    width: 1.5rem;   
+    display: inline-block;
+
+}

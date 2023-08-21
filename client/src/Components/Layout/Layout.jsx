@@ -3,6 +3,7 @@ import { Helmet, HelmetProvider } from "react-helmet-async";
 import "./layout.css";
 import LazyFooter from "../Footer/LazyFooter";
 import Navbar1 from "../Navbar1/Navbar1";
+import Navbar2 from "../Navbar2/Navbar2";
 
 const GoToTop = lazy(() => import("../GoToTop/GoToTop"));
 
@@ -135,7 +136,7 @@ const Layout = ({
 					</script> */}
 				</Helmet>
 				<Navbar1 />
-
+				<Navbar2 />
 				<div className="layout-container">{children}</div>
 				<LazyFooter />
 				<Suspense>

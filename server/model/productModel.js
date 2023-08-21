@@ -23,6 +23,14 @@ var productSchema = new mongoose.Schema(
 		oldPrice: {
 			type: Number,
 			required: true,
+			validate: {
+				validator(price) {
+					return price > 0;
+				},
+				message: "السعز يجب ان يكون اكبر من صفر",
+			},
+
+
 		},
 		newPrice: {
 			type: Number,
@@ -33,14 +41,10 @@ var productSchema = new mongoose.Schema(
 			ref: "PCategory",
 			required: true,
 		},
-		subcategory: {
-			type: [ObjectId],
-			ref: "SubCategory",
-			required: true,
-		},
 		brand: {
-			type: String,
-			required: true,
+			type: ObjectId,
+			ref: "Brand",
+			default: null,
 		},
 		quantity: {
 			type: Number,
@@ -52,7 +56,7 @@ var productSchema = new mongoose.Schema(
 		},
 		images: [
 			{
-				public_id: Number,
+				id: Number,
 				url: String,
 			},
 		],
@@ -68,6 +72,13 @@ var productSchema = new mongoose.Schema(
 		totalrating: {
 			type: String,
 			default: 0,
+		},
+		additionalInfo: {
+			wight: String,
+			dimensions: String,
+			special: String,
+			infoType: String,
+			colors: String,
 		},
 	},
 	{ timestamps: true }

@@ -1,0 +1,9 @@
+.store {
+    display:flex;
+}
+@media screen and (max-width: 1300px) {
+    .store {
+        flex-direction: column-reverse;
+    }
+}
+    

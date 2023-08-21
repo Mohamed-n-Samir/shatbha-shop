@@ -52,32 +52,24 @@ const createUser = asyncHandler(async (req, res) => {
 			return res.status(409).json({ error: "رقم الهاتف موجود بالفعل" });
 
 		if (!validateStringlength(firstname, 3, 20))
-			return res
-				.status(422)
-				.json({
-					error: "firstname must be between 3 and 20 characters",
-				});
+			return res.status(422).json({
+				error: "firstname must be between 3 and 20 characters",
+			});
 
 		if (!validateStringlength(lastname, 3, 20))
-			return res
-				.status(422)
-				.json({
-					error: "lastname must be between 3 and 20 characters",
-				});
+			return res.status(422).json({
+				error: "lastname must be between 3 and 20 characters",
+			});
 
 		if (!validateStringlength(password, 8, 32))
-			return res
-				.status(422)
-				.json({
-					error: "password must be between 6 and 20 characters",
-				});
+			return res.status(422).json({
+				error: "password must be between 6 and 20 characters",
+			});
 
 		if (!validateStringlength(buildingAndApartment, 3, 60))
-			return res
-				.status(422)
-				.json({
-					error: "building And Apartment must be between 3 and 60 characters",
-				});
+			return res.status(422).json({
+				error: "building And Apartment must be between 3 and 60 characters",
+			});
 
 		if (!validateStringlength(area, 3, 20))
 			return res
@@ -108,6 +100,68 @@ const createUser = asyncHandler(async (req, res) => {
 		res.status(500).json({ message: err.message });
 	}
 });
+
+const createAdmin = async (req, res) => {
+	try {
+		const { firstname, lastname, email, mobile, password, gender } =
+			await req.body;
+
+		if (!validateEmail(email))
+			return res
+				.status(422)
+				.json({ error: "البريد الاكتروني مطلوب او خاطئ" });
+		const checkedEmail = await User.findOne({ email: email.toLowerCase() });
+
+		if (checkedEmail)
+			return res
+				.status(409)
+				.json({ error: "البريد الاكتروني موجود بالفعل" });
+
+		if (!validateMobile(mobile))
+			return res.status(422).json({ error: "رقم الهاتف مطلوب او خاطئ" });
+
+		const checkedMobile = await User.findOne({ mobile: mobile });
+
+		if (checkedMobile)
+			return res.status(409).json({ error: "رقم الهاتف موجود بالفعل" });
+
+		if (!validateStringlength(firstname, 3, 20))
+			return res.status(422).json({
+				error: "firstname must be between 3 and 20 characters",
+			});
+
+		if (!validateStringlength(lastname, 3, 20))
+			return res.status(422).json({
+				error: "lastname must be between 3 and 20 characters",
+			});
+
+		if (!validateStringlength(password, 8, 32))
+			return res.status(422).json({
+				error: "password must be between 6 and 20 characters",
+			});
+
+		if (!["Male", "Female"].includes(gender))
+			return res.status(422).json({ error: "gender is required" });
+
+		const user = await new User({
+			firstname,
+			lastname,
+			email: email.toLowerCase(),
+			password,
+			mobile,
+			gender,
+			city: "64d6c066ba4241ab93a23f48",
+			area: "admin area",
+			buildingAndApartment: "admin Building and Apartment",
+			role: "admin",
+		}).save();
+		res.status(200).json({
+			message: "admin created successfully",
+		});
+	} catch (err) {
+		res.status(500).json({ message: err.message });
+	}
+};
 
 // Login a user
 const login = asyncHandler(async (req, res) => {
@@ -190,9 +244,9 @@ const loginAdmin = asyncHandler(async (req, res) => {
 
 // handle refresh token
 
-const handleRefreshToken = asyncHandler(async (req, res, next) => {
+const handleRefreshToken = async (req, res, next) => {
 	const cookie = req.cookies;
-	if (!cookie?.refToken) throw new Error("No Refresh Token in Cookies");
+	if (!cookie?.refToken) return res.json({ error: "no token" });
 	const refreshToken = cookie.refToken;
 	const user = await User.findOne({ refreshToken });
 	console.log(user);
@@ -204,8 +258,8 @@ const handleRefreshToken = asyncHandler(async (req, res, next) => {
 		refreshToken,
 		process.env.REFRESH_TOKEN,
 		async (err, decoded) => {
-			console.log(decoded._id);
-			if (err || user?._id.toString() !== decoded._id) {
+			console.log(decoded?._id);
+			if (err || user?._id.toString() !== decoded?._id) {
 				console.log("halaw1");
 				console.log(err);
 				console.log(decoded);
@@ -231,7 +285,7 @@ const handleRefreshToken = asyncHandler(async (req, res, next) => {
 			}
 		}
 	);
-});
+};
 
 // logout functionality
 
@@ -271,8 +325,7 @@ const logout = asyncHandler(async (req, res) => {
 		return res.status(200).json({
 			message: "تم تسجيل الخروج بنجاح",
 		}); // forbidden
-	}
-	else if (cookie?.jwt) {
+	} else if (cookie?.jwt) {
 		res.clearCookie("jwt", {
 			httpOnly: true,
 			// secure: true,
@@ -287,28 +340,24 @@ const logout = asyncHandler(async (req, res) => {
 
 // Update a user
 
-const updatedUser = asyncHandler(async (req, res) => {
-	const { _id } = req.user;
+const updateUser = async (req, res) => {
+	const _id = req.params.id;
+	const data = req.body;
+	console.log(data);
 	validateMongoDbId(_id);
 
 	try {
-		const updatedUser = await User.findByIdAndUpdate(
-			_id,
-			{
-				firstname: req?.body?.firstname,
-				lastname: req?.body?.lastname,
-				email: req?.body?.email,
-				mobile: req?.body?.mobile,
-			},
-			{
-				new: true,
-			}
-		);
-		res.json(updatedUser);
+		const updatedUser = await User.findByIdAndUpdate(_id, data, {
+			new: true,
+			runValidators: true,
+		});
+		console.log(updatedUser);
+		res.status(200).json({ message: "تم تحديث البيانات بنجاح" });
 	} catch (error) {
-		throw new Error(error);
+		console.log(error.message);
+		res.status(500).json({ error: error.message});
 	}
-});
+};
 
 // save user Address
 
@@ -336,8 +385,22 @@ const saveAddress = asyncHandler(async (req, res, next) => {
 
 const getallUser = asyncHandler(async (req, res) => {
 	try {
-		const getUsers = await User.find().populate("wishlist");
-		res.json(getUsers);
+		const allUsers = await User.find({
+			role: "user",
+		}).populate("city");
+		res.status(200).json({ allUsers });
+	} catch (error) {
+		throw new Error(error);
+	}
+});
+// Get all admins
+
+const getallAdmins = asyncHandler(async (req, res) => {
+	try {
+		const allAdmins = await User.find({
+			role: "admin",
+		}).populate("city");
+		res.status(200).json({ allAdmins });
 	} catch (error) {
 		throw new Error(error);
 	}
@@ -350,7 +413,10 @@ const getaUser = asyncHandler(async (req, res) => {
 	validateMongoDbId(id);
 
 	try {
-		const getaUser = await User.findById(id);
+		const getaUser = await User.findById(id)
+			.populate("wishlist")
+			.populate("cart")
+			.populate("orders");
 		res.json({
 			getaUser,
 		});
@@ -676,9 +742,10 @@ module.exports = {
 	createUser,
 	login,
 	getallUser,
+	getallAdmins,
 	getaUser,
 	deleteaUser,
-	updatedUser,
+	updateUser,
 	blockUser,
 	unblockUser,
 	handleRefreshToken,
@@ -698,4 +765,5 @@ module.exports = {
 	getAllOrders,
 	getOrderByUserId,
 	getUserData,
+	createAdmin,
 };

@@ -141,11 +141,15 @@ const RegFormBody = () => {
 						اختر المدينه (ان لم تجد المدينه الخاصه بك فلا يوجد خدمه
 						شحن لها)
 					</option>
-					{data?.data?.map((city) => (
-						<option value={city._id} key={city._id}>
-							{city.name}
-						</option>
-					))}
+					{data?.data?.map((city) => {
+						return (
+							city.name !== "Admin" && (
+								<option value={city._id} key={city._id}>
+									{city.name}
+								</option>
+							)
+						);
+					})}
 				</Form.Select>
 			</Form.Group>
 			<Form.Group controlId="area">
@@ -190,7 +194,7 @@ const RegFormBody = () => {
 			</Form.Group>
 			{isLoading && (
 				<Row className="justify-content-center">
-					<HashLoader size={30}/>
+					<HashLoader size={30} />
 				</Row>
 			)}
 			<Row>

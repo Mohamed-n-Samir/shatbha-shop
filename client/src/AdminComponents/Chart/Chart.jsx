@@ -60,7 +60,7 @@ const Chart = () => {
 			return (
 				<div className="chart p-3">
 					<div className="top d-flex align-items-center justify-content-between text-body-tertiary">
-						<div className="title fs-3 fw-semibold">Last 6 Months (Revenue)</div>
+						<div className="title fs-3 fw-semibold">ربح الستة اشهر الاخيره</div>
 					</div>
 					<div className="bottom p-5 d-flex flex-column align-items-center justify-content-center w-100 h100">
                     <ResponsiveContainer  width="100%" aspect={2 / 1}>
@@ -69,6 +69,7 @@ const Chart = () => {
 							height={250}
 							data={dailyIncome}
 							margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+							
 						>
 							<defs>
 								<linearGradient

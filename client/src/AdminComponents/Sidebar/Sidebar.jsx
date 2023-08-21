@@ -6,6 +6,10 @@ import QuizIcon from "@mui/icons-material/Quiz";
 import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
 import OndemandVideoIcon from "@mui/icons-material/OndemandVideo";
 import NewspaperIcon from "@mui/icons-material/Newspaper";
+import ProductionQuantityLimitsIcon from '@mui/icons-material/ProductionQuantityLimits';
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
+import BrandingWatermarkIcon from '@mui/icons-material/BrandingWatermark';
+import CategoryIcon from '@mui/icons-material/Category';
 import "./sidebar.css";
 
 const SideBar = () => {
@@ -52,6 +56,21 @@ const SideBar = () => {
 					</li>
 					<li className="sidebar-item d-flex align-items-center">
 						<NavLink
+							to="/dashboard/admins"
+							className={({ isActive }) =>
+								isActive
+									? activeStyle
+									: "text-decoration-none py-3 px-3  w-100"
+							}
+						>
+							<AdminPanelSettingsIcon className="fs-2 mx-3 text-dark " />
+							<span className="fs-4 fw-bold  text-body-tertiary">
+								المسئولين
+							</span>
+						</NavLink>
+					</li>
+					<li className="sidebar-item d-flex align-items-center">
+						<NavLink
 							to="/dashboard/products"
 							className={({ isActive }) =>
 								isActive
@@ -59,7 +78,7 @@ const SideBar = () => {
 									: "text-decoration-none py-3 px-3  w-100"
 							}
 						>
-							<ClassIcon className="fs-2 mx-3 text-dark" />
+							<ProductionQuantityLimitsIcon className="fs-2 mx-3 text-dark" />
 							<span className="fs-4 fw-bold  text-body-tertiary">
 								المنتجات
 							</span>
@@ -74,7 +93,7 @@ const SideBar = () => {
 									: "text-decoration-none py-3 px-3  w-100"
 							}
 						>
-							<QuizIcon className="fs-2 mx-3 text-dark" />
+							<BrandingWatermarkIcon className="fs-2 mx-3 text-dark" />
 							<span className="fs-4 fw-bold  text-body-tertiary">
 								الماركات
 							</span>
@@ -89,7 +108,7 @@ const SideBar = () => {
 									: "text-decoration-none py-3 px-3  w-100"
 							}
 						>
-							<OndemandVideoIcon className="fs-2 mx-3 text-dark" />
+							<CategoryIcon className="fs-2 mx-3 text-dark" />
 							<span className="fs-4 fw-bold  text-body-tertiary">
 								الاقسام
 							</span>
@@ -104,7 +123,7 @@ const SideBar = () => {
 									: "text-decoration-none py-3 px-3  w-100"
 							}
 						>
-							<NewspaperIcon className="fs-2 mx-3 text-dark" />
+							<CategoryIcon className="fs-2 mx-3 text-dark" />
 							<span className="fs-4 fw-bold  text-body-tertiary">
 								الاقسام الفرعيه
 							</span>

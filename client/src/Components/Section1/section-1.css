@@ -1,0 +1,10 @@
+.section-1 {
+    min-height: 40rem;
+}
+
+.section-1 h1 {
+    font-size: 4rem;
+    font-weight: 600;
+    color: #000;
+    margin-bottom: 1rem;
+}

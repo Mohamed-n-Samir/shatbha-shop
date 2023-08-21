@@ -1,0 +1,25 @@
+.store-section {
+    flex: 6;
+    padding: 1rem;
+
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 4rem;
+}
+
+.pagination .pagination-btn {
+    background-color: var(--white-color);
+    padding: 1rem 2rem;
+    color: var(--text-color);
+    border: .1rem solid rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+}
+
+.pagination .pagination-btn.active-btn {
+    background-color: var(--black-color);
+    color: var(--white-color);
+}

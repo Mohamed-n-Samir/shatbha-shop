@@ -5,7 +5,7 @@
     height: 12rem;
 }
 
-.widget .left .link, .widget .right .link {
+.widget .left .wid-link, .widget .right .wid-link {
     border-bottom: .1rem solid var(--black-color);
     cursor: pointer;
     width: max-content;
