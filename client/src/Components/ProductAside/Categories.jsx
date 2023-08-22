@@ -47,13 +47,13 @@ const Categories = () => {
 			<ul className="main-ul">
 				{data?.data?.allSubCategory?.map((category) => (
 					<li key={category._id} className="">
-						<Link to={`/product-category/${category.category.title}`}>
+						<Link to={`/products?cat=${category.category._id}`}>
 							{category?.category?.title}
 						</Link>
                         <ul className="inner-ul">
                             {category?.subCategory?.map((subCategory) => (
                                 <li key={subCategory}>
-                                    <Link to={`/product-category/${category.category.title}/${subCategory}`}>
+                                    <Link to={`/products?cat=${subCategory}`}>
                                         {subCategory}
                                     </Link>
                                 </li>

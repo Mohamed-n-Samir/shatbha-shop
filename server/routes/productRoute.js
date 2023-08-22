@@ -8,7 +8,8 @@ const {
 	addToWishlist,
 	getOffers,
 	rating,
-	getAllProduct1
+	getAllProduct1,
+	test,
 } = require("./../controllers/productCtrl");
 const { isAdmin, authMiddleware } = require("../middleware/authMiddleware");
 const router = express.Router();
@@ -23,5 +24,7 @@ router.route("/api/allProductForUsers").get(getAllProduct1);
 router.route("/:id").get(getaProduct);
 router.route("/wishlist").put(authMiddleware, addToWishlist);
 router.route("/rating").put(authMiddleware, rating);
+
+router.route("/api/test").get(test);
 
 module.exports = router;

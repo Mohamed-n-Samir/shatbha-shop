@@ -1,8 +1,10 @@
 const Product = require("../model/productModel");
+const SubCategory = require("../model/subCategory");
 const User = require("../model/userModel");
 const asyncHandler = require("express-async-handler");
 const slugify = require("slugify");
 const validateMongoDbId = require("../helpers/validateMongodbId");
+const mongoose = require("mongoose");
 
 const createProduct = async (req, res) => {
 	const {
@@ -137,13 +139,89 @@ const getAllProduct = asyncHandler(async (req, res) => {
 	}
 });
 
+// const getAllProduct1 = async (req, res) => {
+// 	try {
+// 		// Filtering
+// 		const queryObj = { ...req.query };
+// 		const excludeFields = ["page", "sort", "limit", "fields"];
+// 		let queryStr;
+// 		let query;
+// 		if (queryObj) {
+// 			excludeFields.forEach((el) => delete queryObj[el]);
+// 			queryStr = JSON.stringify(queryObj);
+// 			queryStr = queryStr.replace(
+// 				/\b(gte|gt|lte|lt)\b/g,
+// 				(match) => `$${match}`
+// 			);
+
+// 			if (req.query.title) {
+// 				console.log(JSON.parse(queryStr))
+// 				query = Product.find({
+// 					...JSON.parse(queryStr),
+// 					title: new RegExp(req.query.title, "i"),
+// 				}).populate("category");
+// 			} else {
+// 				console.log(JSON.parse(queryStr))
+// 				query = Product.find(JSON.parse(queryStr)).populate("category");
+// 			}
+// 		}
+
+// 		// Sorting
+
+// 		if (req.query.sort) {
+// 			const sortBy = req.query.sort.split(",").join(" ");
+// 			query = query.sort(sortBy);
+// 		} else {
+// 			query = query.sort("-createdAt");
+// 		}
+
+// 		// limiting the fields
+
+// 		if (req.query.fields) {
+// 			const fields = req.query.fields.split(",").join(" ");
+// 			query = query.select(fields);
+// 		} else {
+// 			query = query.select("-__v");
+// 		}
+
+// 		const productCount = await Product.find(query).countDocuments();
+
+// 		// pagination
+
+// 		// let productCount = 12
+
+// 		const page = req.query.page || 1;
+// 		const limit = req.query.limit || 5;
+// 		const skip = (page - 1) * limit;
+// 		query = query.skip(skip).limit(limit);
+
+// 		console.log("halawa");
+
+// 		if (skip >= productCount && page > 1)
+// 			return res.status(404).json({ message: "هذه الصفحه غير موجوده" });
+
+// 		const products = await query;
+// 		// console.log(products.length);
+// 		res.status(200).json({
+// 			products: {
+// 				productCount,
+// 				products,
+// 			},
+// 		});
+// 	} catch (error) {
+// 		console.log(error);
+// 		return res.status(500).json({ error: error.message });
+// 	}
+// };
+
 const getAllProduct1 = async (req, res) => {
 	try {
 		// Filtering
 		const queryObj = { ...req.query };
-		const excludeFields = ["page", "sort", "limit", "fields"];
+		const excludeFields = ["page", "sort", "limit", "fields", "tags"];
 		let queryStr;
 		let query;
+		let subCategory;
 		if (queryObj) {
 			excludeFields.forEach((el) => delete queryObj[el]);
 			queryStr = JSON.stringify(queryObj);
@@ -152,13 +230,51 @@ const getAllProduct1 = async (req, res) => {
 				(match) => `$${match}`
 			);
 
+			console.log(queryStr);
+			console.log(JSON.parse(queryStr));
+
 			if (req.query.title) {
-				query = Product.find({
+				query = {
 					...JSON.parse(queryStr),
 					title: new RegExp(req.query.title, "i"),
-				}).populate("category");
+				};
+				console.log(query);
 			} else {
-				query = Product.find(JSON.parse(queryStr)).populate("category");
+				query = JSON.parse(queryStr);
+			}
+
+			if (req.query.tags) {
+				console.log(req.query.tags);
+				if (mongoose.Types.ObjectId.isValid(req.query.tags)) {
+					console.log("halawaaaaaaaaaaaaaaaa111");
+					query = Product.find({
+						...query,
+						$or: [
+							{
+								tags: {
+									$elemMatch: {
+										$in: await SubCategory.find({
+											category: req.query.tags,
+										}).distinct("subCategory"),
+									},
+								},
+							},
+							{
+								category: req.query.tags,
+							},
+						],
+					}).populate("category");
+					subCategory = await SubCategory.findOne({
+						category: req.query.tags,
+					}).populate("category");
+				} else {
+					query = Product.find({
+						...query,
+						tags: req.query.tags,
+					}).populate("category");
+				}
+			} else {
+				query = Product.find(query).populate("category");
 			}
 		}
 
@@ -191,17 +307,17 @@ const getAllProduct1 = async (req, res) => {
 		const skip = (page - 1) * limit;
 		query = query.skip(skip).limit(limit);
 
-		console.log("halawa");
-
 		if (skip >= productCount && page > 1)
 			return res.status(404).json({ message: "هذه الصفحه غير موجوده" });
 
 		const products = await query;
-		// console.log(products.length);
+
 		res.status(200).json({
 			products: {
 				productCount,
 				products,
+				category:
+					subCategory !== {} ? subCategory?.category?.title : null,
 			},
 		});
 	} catch (error) {
@@ -319,6 +435,39 @@ const getOffers = async (req, res) => {
 	}
 };
 
+const test = async (req, res) => {
+	try {
+		const product = await Product.find({}).populate({
+			path: "category",
+			match: { title: "إكسسوارات" },
+		});
+		res.status(200).json({ product });
+		// const product = await Product.find({
+		// 	$or: [
+		// 		{
+		// 			tags: {
+		// 				$elemMatch: {
+		// 					$in: await SubCategory.find({
+		// 						category: "64dfcf2aa4724030ed2e80e8",
+		// 					}).distinct("subCategory"),
+		// 				},
+		// 			},
+		// 		},
+		// 		{
+		// 			category: "64dfcf2aa4724030ed2e80e8",
+		// 		},
+		// 	],
+		// });
+		// console.log(product.length);
+
+		// return res.status(200).json({ product });
+	} catch (error) {
+		console.log("halawatayn");
+		console.log(error.message);
+		return res.status(500).json({ error: error.message });
+	}
+};
+
 module.exports = {
 	createProduct,
 	getaProduct,
@@ -329,4 +478,5 @@ module.exports = {
 	rating,
 	getOffers,
 	getAllProduct1,
+	test,
 };

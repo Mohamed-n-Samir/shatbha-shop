@@ -29,8 +29,6 @@ var productSchema = new mongoose.Schema(
 				},
 				message: "السعز يجب ان يكون اكبر من صفر",
 			},
-
-
 		},
 		newPrice: {
 			type: Number,
@@ -86,3 +84,5 @@ var productSchema = new mongoose.Schema(
 
 //Export the model
 module.exports = mongoose.model("Product", productSchema);
+
+

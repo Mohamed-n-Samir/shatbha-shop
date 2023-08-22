@@ -8,18 +8,17 @@ const MIN = 0;
 const MAX = 15000;
 
 const Store = () => {
-	window.scrollTo(0, 0);
-
 	const [value, setValue] = useState([MIN, MAX]);
 	const [comValue, setcomValue] = useState([MIN, MAX]);
 	const [sort,setSort] = useState("-createdAt")
+	const [itemsNubmer, setItemsNubmer] = useState(0);
 
 
 	return (
 		<Layout>
 			<main className={`d-flex store pt-3`}>
-				<ProductAside value={value} setValue={setValue} MIN={MIN} MAX={MAX} setcomValue={setcomValue} setSort={setSort}/>
-				<StoreSection gte={comValue[0]} lte={comValue[1]} sort={sort}/>
+				<ProductAside value={value} setValue={setValue} MIN={MIN} MAX={MAX} setcomValue={setcomValue} setSort={setSort} itemsNubmer={itemsNubmer}/>
+				<StoreSection gte={comValue[0]} lte={comValue[1]} sort={sort} setItemsNubmer={setItemsNubmer}/>
 			</main>
 		</Layout>
 	);

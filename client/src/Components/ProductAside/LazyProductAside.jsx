@@ -9,6 +9,7 @@ const LazyProductAside = ({
 	MAX,
 	setcomValue,
 	setSort,
+	itemsNubmer
 }) => {
 	const [isVisible, setIsVisible] = useState(false);
 	const FooterRef = useRef();
@@ -43,6 +44,7 @@ const LazyProductAside = ({
 						MAX={MAX}
 						setcomValue={setcomValue}
 						setSort={setSort}
+						itemsNubmer={itemsNubmer}
 					/>
 				</Suspense>
 			) : (

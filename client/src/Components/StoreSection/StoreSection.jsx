@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import useQueryCustom from "../../hooks/useQueryCustom";
 import { Row, Col } from "react-bootstrap";
 import HashLoader from "react-spinners/HashLoader";
@@ -6,15 +6,22 @@ import Card2 from "../Card2/Card2";
 import { useSearchParams } from "react-router-dom";
 import "./store-section.css";
 
-const StoreSection = ({ gte, lte, sort }) => {
+const StoreSection = ({ gte, lte, sort, setItemsNubmer }) => {
 	const [searchParams] = useSearchParams();
-	console.log(searchParams.get("sr"));
 	const [pageNumber, setPageNumber] = useState(1);
 	const limit = 9;
 
 	const { data, isError, isFetching, isLoading, refetch, isPreviousData } =
 		useQueryCustom(
-			["products-data", pageNumber, gte, lte, sort,searchParams.get("sr")],
+			[
+				"products-data",
+				pageNumber,
+				gte,
+				lte,
+				sort,
+				searchParams.get("sr"),
+				searchParams.get("cat"),
+			],
 			"/allProductForUsers",
 			{
 				refetchOnMount: false,
@@ -31,9 +38,16 @@ const StoreSection = ({ gte, lte, sort }) => {
 					},
 					sort: sort,
 					title: searchParams.get("sr"),
+					tags: searchParams.get("cat"),
 				},
 			}
 		);
+
+	useEffect(() => {
+		if (data?.data?.products?.productCount) {
+			setItemsNubmer(data?.data?.products?.productCount);
+		}
+	}, [data?.data?.products?.productCount]);
 
 	const [pageNumberLimit, setPageNumberLimit] = useState(4);
 	const [maxPageNumberLimit, setMaxPageNumberLimit] = useState(4);
@@ -50,7 +64,14 @@ const StoreSection = ({ gte, lte, sort }) => {
 	if (isError) {
 		return (
 			<section className="d-flex flex-column gap-5 store-section">
-				<h1>المتجر</h1>
+				<h1
+					style={{
+						fontSize: "4rem",
+						fontWeight: "700",
+					}}
+				>
+					المتجر
+				</h1>
 				<div className="is-loading">
 					<h2 className="text-center">
 						حدث خطأ اثناء التحميل اعد تحميل الصفحه!!!
@@ -96,11 +117,49 @@ const StoreSection = ({ gte, lte, sort }) => {
 	}
 
 	if (data && data?.data?.products?.productCount === 0) {
-		console.log(data?.data?.products);
 		return (
 			<section className="d-flex flex-column gap-5 store-section">
-				<h1>المتجر</h1>
-				<div className="is-loading">
+				<h1
+					style={{
+						fontSize: "4rem",
+						fontWeight: "700",
+					}}
+				>
+					المتجر
+				</h1>
+				{searchParams.get("sr") && (
+					<h1
+						style={{
+							fontSize: "3rem",
+							fontWeight: "700",
+							color: "var(--text2-color)",
+						}}
+					>
+						نتائج البحث عن: {searchParams.get("sr")}
+					</h1>
+				)}
+				{searchParams.get("cat") && !data?.data?.products?.category ? (
+					<h1
+						style={{
+							fontSize: "3rem",
+							fontWeight: "700",
+							color: "var(--text2-color)",
+						}}
+					>
+						القسم: {searchParams.get("cat")}
+					</h1>
+				) : (
+					<h1
+						style={{
+							fontSize: "3rem",
+							fontWeight: "700",
+							color: "var(--text2-color)",
+						}}
+					>
+						القسم: {data?.data?.products?.category}
+					</h1>
+				)}
+				<div className="is-loading align-items-start">
 					<h2 className="text-center">!!! لا يوجد منتجات</h2>
 				</div>
 			</section>
@@ -108,7 +167,6 @@ const StoreSection = ({ gte, lte, sort }) => {
 	}
 
 	if (data && data?.data?.products?.productCount > 0) {
-		console.log(data?.data?.products);
 		return (
 			<section className="d-flex flex-column gap-4 store-section">
 				<h1
@@ -130,6 +188,27 @@ const StoreSection = ({ gte, lte, sort }) => {
 						نتائج البحث عن: {searchParams.get("sr")}
 					</h1>
 				)}
+				{searchParams.get("cat") && !data?.data?.products?.category ? (
+					<h1
+						style={{
+							fontSize: "3rem",
+							fontWeight: "700",
+							color: "var(--text2-color)",
+						}}
+					>
+						القسم: {searchParams.get("cat")}
+					</h1>
+				) : (
+					<h1
+						style={{
+							fontSize: "3rem",
+							fontWeight: "700",
+							color: "var(--text2-color)",
+						}}
+					>
+						القسم: {data?.data?.products?.category}
+					</h1>
+				)}
 				<p
 					style={{
 						fontSize: "1.5rem",
@@ -144,7 +223,7 @@ const StoreSection = ({ gte, lte, sort }) => {
 				<section>
 					<Row className="px-4">
 						{data?.data?.products?.products?.map((item, index) => {
-							console.log(item);
+							// console.log(item);
 							return (
 								<Col
 									style={{
