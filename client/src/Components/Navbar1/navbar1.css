@@ -1,4 +1,3 @@
-
 .navbar1 {
 	width: 100%;
 	height: fit-content;
@@ -29,7 +28,6 @@
 	font-size: 1.4rem;
 	margin: 0;
 	padding: 0;
-	
 }
 
 .link {
@@ -49,8 +47,8 @@
 
 .link a.active-style {
 	/* background-color: var(--purple-color); */
-	padding: 1rem 2rem;
-	border: .7px solid var(--black-color);
+	padding: 1rem 1.8rem;
+	border: 0.7px solid var(--black-color);
 	border-radius: 0.7rem 0.7rem;
 	-webkit-border-radius: 0.7rem 0.7rem;
 	-moz-border-radius: 0.7rem 0.7rem;
@@ -60,14 +58,14 @@
 
 .link a:hover {
 	/* background-color: var(--purple-color); */
-	
-	padding: 1rem 2rem;
-	border-radius: 0.7rem 0.7rem; 
+
+	padding: 1rem 1.8rem;
+	border-radius: 0.7rem 0.7rem;
 	-webkit-border-radius: 0.7rem 0.7rem;
 	-moz-border-radius: 0.7rem 0.7rem;
 	-ms-border-radius: 0.7rem 0.7rem;
 	-o-border-radius: 0.7rem 0.7rem;
-	border: .5px solid var(--black-color);
+	border: 0.5px solid var(--black-color);
 }
 
 .links .logout-btn {
@@ -75,14 +73,13 @@
 	margin-left: 1.2rem;
 	background-color: transparent;
 	border-radius: 0.7rem 0.7rem;
-	border: .1rem solid var(--danger-color);
+	border: 0.1rem solid var(--danger-color);
 }
 
 .links .logout-btn:hover {
 	padding: 1.2rem 3rem;
 	background-color: var(--danger-color);
 	margin: 0 1.5rem;
-
 }
 
 .search-form {
@@ -115,7 +112,18 @@
 	}
 	.link a:not(.active-style):hover {
 		padding: 0;
-		border-radius:none; 
+		border-radius: none;
 		border: none;
 	}
+}
+
+.cart-quantity {
+	top: -1rem;
+	right: -1.1rem;
+	z-index: 999;
+	border-radius: 50%;
+	padding: 0.1rem 0.7rem;
+	background-color: var(--black-color);
+	color: var(--white-color);
+	font-size: 1.2rem;
 }

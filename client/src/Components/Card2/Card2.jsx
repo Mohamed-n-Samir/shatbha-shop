@@ -2,10 +2,13 @@ import { useState } from "react";
 import { Button, Row } from "react-bootstrap";
 import { FavoriteBorder } from "@mui/icons-material";
 import { Link } from "react-router-dom";
+import { useShoppingCart } from "../../context/ShoppingCartContext";
 import "./card2.css";
 
-const Card2 = ({ imgs, title, oldPrice, newPrice, category, slug }) => {
+const Card2 = ({ imgs, title, oldPrice, newPrice, category, slug, id }) => {
 	const [img, setImg] = useState(imgs[0].url);
+	const { addToCart, getItemsQuantity, removeFromCart,removeAllQuantity } = useShoppingCart();
+	const quantity = getItemsQuantity(id);
 	return (
 		<div className="card2">
 			<Link to={`/product/${slug}`}>
@@ -45,9 +48,50 @@ const Card2 = ({ imgs, title, oldPrice, newPrice, category, slug }) => {
 			</Link>
 
 			<div className="d-flex flex-column justify-content-center align-items-center gap-2 my-3">
-				<Button className="py-4 px-5 fs-4 btn-dark fw-bold">
-					إضافة إلى السلة
-				</Button>
+				{quantity === 0 ? (
+					<Button
+						className="py-4 px-5 fs-4 btn-dark fw-bold"
+						onClick={() => {
+							console.log(id);
+							addToCart({id,title,oldPrice,newPrice,image:imgs[0].url});
+						}}
+					>
+						إضافة إلى السلة
+					</Button>
+				) : (
+					<>
+					<div className="mb-3">
+						<div className="d-flex align-items-center justify-content-center gap-3">
+							<Button
+								className="fs-4"
+								variant="dark"
+								onClick={() => addToCart({id,title,oldPrice,newPrice})}
+							>
+								+
+							</Button>
+							<span className="fs-3">{quantity}</span>
+							<Button
+								className="fs-4"
+								variant="dark"
+								onClick={() => removeFromCart(id)}
+							>
+								-
+							</Button>
+						</div>
+					</div>
+					<Button
+						variant="outline-danger"
+						className="py-4 px-5 fs-4 fw-bold"
+						onClick={() => {
+							console.log(id);
+							removeAllQuantity(id);
+						}}
+					>
+						حذف من السلة
+					</Button>
+					</>
+				)}
+
 				<Button
 					variant="outline-dark"
 					className="py-4 px-5 fs-4 fw-bold"

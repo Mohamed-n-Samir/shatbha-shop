@@ -63,3 +63,6 @@ input[type="color"]:focus,
 	box-shadow: 0.2rem 0.4rem 1rem 0.1rem rgba(201, 201, 201, 0.47);
 }
 
+.zIndex-9999 {
+	z-index: 9999 !important;
+}

@@ -199,15 +199,17 @@ const StoreSection = ({ gte, lte, sort, setItemsNubmer }) => {
 						القسم: {searchParams.get("cat")}
 					</h1>
 				) : (
-					<h1
-						style={{
-							fontSize: "3rem",
-							fontWeight: "700",
-							color: "var(--text2-color)",
-						}}
-					>
-						القسم: {data?.data?.products?.category}
-					</h1>
+					data?.data?.products?.category && (
+						<h1
+							style={{
+								fontSize: "3rem",
+								fontWeight: "700",
+								color: "var(--text2-color)",
+							}}
+						>
+							القسم: {data?.data?.products?.category}
+						</h1>
+					)
 				)}
 				<p
 					style={{
@@ -244,6 +246,7 @@ const StoreSection = ({ gte, lte, sort, setItemsNubmer }) => {
 										oldPrice={item.oldPrice}
 										title={item.title}
 										slug={item.slug}
+										id={item._id}
 									/>
 								</Col>
 							);

@@ -4,12 +4,16 @@ import { NavLink, useLocation, Link } from "react-router-dom";
 import DropDown from "../DropDown/DropDown";
 import Search from "../Search/Search";
 import { ReactComponent as Cart } from "../../assets/icons/cart.svg";
+import { useShoppingCart } from "../../context/ShoppingCartContext";
 import "./navbar1.css";
+import { Button } from "react-bootstrap";
 
 const Navbar1 = () => {
 	// const isLargeScreen = useMediaQuery({
 	// 	query: "(min-width: 950px)",
 	// });
+
+	const { cartItems, openCart } = useShoppingCart();
 
 	let activeStyle = "active-style";
 
@@ -17,14 +21,6 @@ const Navbar1 = () => {
 	const isActive = ["/", "/home"].includes(pathname);
 
 	const [clicked, setClicked] = useState(false);
-	// const { logout, loading } = useLogout();
-	// if (loading) {
-	// 	return (
-	// 		<div className="is-page-loading">
-	// 			<PropagateLoader color="#6600cc" />
-	// 		</div>
-	// 	);
-	// } else {
 
 	return (
 		<>
@@ -95,19 +91,26 @@ const Navbar1 = () => {
 						>
 							<DropDown title={"حسابي"} />
 						</li>
-						<li className="link">
-							<NavLink
-								to="/cart"
-								className={({ isActive }) =>
-									isActive ? activeStyle : undefined
-								}
+						<li className="link ">
+							<Button
+								variant="white"
+								className="position-relative"
+								onClick={openCart}
 							>
-								<Cart />
-							</NavLink>
+								{cartItems.length > 0 && (
+									<div className="cart-quantity position-absolute d-flex justify-content-center align-items-center ">
+										{cartItems.length}
+									</div>
+								)}
+								<Cart
+									style={{
+										fontSize: "1.4rem",
+									}}
+								/>
+							</Button>
 						</li>
 					</ul>
-					<Search/>
-
+					<Search />
 				</div>
 			</nav>
 		</>

@@ -31,7 +31,6 @@ const Categories = () => {
 		);
 	}
 
-    console.log(data?.data?.allSubCategory)
 
 	if (data?.data?.allSubCategory?.length === 0) {
 		return (
@@ -42,24 +41,32 @@ const Categories = () => {
 	}
 
 	if (data?.data?.allSubCategory?.length > 0) {
-        console.log(data?.data?.allSubCategory)
 		return (
 			<ul className="main-ul">
 				{data?.data?.allSubCategory?.map((category) => (
 					<li key={category._id} className="">
-						<Link to={`/products?cat=${category.category._id}`}>
+						<Link
+							to={`/products?cat=${category.category._id}`}
+							onClick={() => {
+								window.scrollTo(0, 0);
+							}}
+						>
 							{category?.category?.title}
 						</Link>
-                        <ul className="inner-ul">
-                            {category?.subCategory?.map((subCategory) => (
-                                <li key={subCategory}>
-                                    <Link to={`/products?cat=${subCategory}`}>
-                                        {subCategory}
-                                    </Link>
-                                </li>
-                            ))}
-                        </ul>
-
+						<ul className="inner-ul">
+							{category?.subCategory?.map((subCategory) => (
+								<li key={subCategory}>
+									<Link
+										to={`/products?cat=${subCategory}`}
+										onClick={() => {
+											window.scrollTo(0, 0);
+										}}
+									>
+										{subCategory}
+									</Link>
+								</li>
+							))}
+						</ul>
 					</li>
 				))}
 			</ul>

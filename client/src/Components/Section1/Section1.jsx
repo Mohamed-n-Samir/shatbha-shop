@@ -73,7 +73,7 @@ const Section1 = () => {
 							md={6}
 							xl={3}
 						>
-							<Card2 imgs={item.images} category={item.category.title} newPrice={item.newPrice} oldPrice={item.oldPrice} title={item.title} slug={item.slug}/>
+							<Card2 imgs={item.images} category={item.category.title} newPrice={item.newPrice} oldPrice={item.oldPrice} title={item.title} slug={item.slug} id={item._id}/>
 						</Col>;
 					})}
 				</Row>
