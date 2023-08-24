@@ -1,8 +1,10 @@
 import { Button, Stack } from "react-bootstrap";
 import { useShoppingCart } from "../../context/ShoppingCartContext";
+import { useNavigate } from "react-router-dom";
 
-const CartItem = ({ id, quantity, title, image, oldPrice, newPrice }) => {
+const CartItem = ({ id, quantity, title, image, oldPrice, newPrice, quan,slug }) => {
 	const { removeAllQuantity, addToCart, removeFromCart } = useShoppingCart();
+	// const navigate = useNavigate();
 	return (
 		<Stack
 			direction="horizontal"
@@ -23,6 +25,9 @@ const CartItem = ({ id, quantity, title, image, oldPrice, newPrice }) => {
 					objectFit: "cover",
 					borderRadius: "10px",
 				}}
+				onClick={() => {
+					// navigate(`/products/${slug}`);
+				}}
 			/>
 			<div className="fs-5 ms-auto">
 				<div>
@@ -39,6 +44,7 @@ const CartItem = ({ id, quantity, title, image, oldPrice, newPrice }) => {
 									oldPrice,
 									newPrice,
 									image,
+									quan,
 								});
 							}}
 						>

@@ -1,43 +1,59 @@
-import { createContext, useState, useContext ,useEffect } from "react";
+import { createContext, useState, useContext, useEffect } from "react";
 import ShoppingCart from "../Components/ShoppingCart/ShoppingCart";
+import { toast } from "react-toastify";
 
 const ShoppingCartContext = createContext({});
 
-const initialCartItems = localStorage.getItem("cartItems") ? JSON.parse(localStorage.getItem("cartItems")) : [];
-
+const initialCartItems = localStorage.getItem("cartItems")
+	? JSON.parse(localStorage.getItem("cartItems"))
+	: [];
 
 const ShoppingCartProvider = ({ children }) => {
-    const [isOpen, setIsOpen] = useState(false);
+	const [isOpen, setIsOpen] = useState(false);
 	const [cartItems, setCartItems] = useState(initialCartItems);
 
-    useEffect(() => {
-        const cartItems = JSON.parse(localStorage.getItem("cartItems"));
-        if(cartItems){
-            setCartItems(cartItems)
-        }
-    }, [])
+	useEffect(() => {
+		const cartItems = JSON.parse(localStorage.getItem("cartItems"));
+		if (cartItems) {
+			setCartItems(cartItems);
+		}
+	}, []);
 
-    useEffect(() => {
-        localStorage.setItem("cartItems", JSON.stringify(cartItems));
-    }, [cartItems])
+	useEffect(() => {
+		localStorage.setItem("cartItems", JSON.stringify(cartItems));
+	}, [cartItems]);
 
-
-
-    const openCart = () => setIsOpen(true);
-    const closeCart = () => setIsOpen(false);
+	const openCart = () => setIsOpen(true);
+	const closeCart = () => setIsOpen(false);
 	const getItemsQuantity = (id) => {
 		return cartItems.find((item) => item.id === id)?.quantity || 0;
 	};
-	const addToCart = ({ id, title, oldPrice, newPrice,image }) => {
-		setCartItems((prev) => {
-			const isItemInCart = prev.find((i) => i.id === id);
-			if (isItemInCart) {
-				return prev.map((i) =>
-					i.id === id ? { ...i, quantity: i.quantity + 1 } : i
-				);
-			}
-			return [...prev, { id, title, oldPrice, newPrice,image, quantity: 1 }];
-		});
+	const addToCart = ({ id, title, oldPrice, newPrice, image, quan,slug }) => {
+		console.log(quan);
+		if (quan > getItemsQuantity(id)) {
+			setCartItems((prev) => {
+				const isItemInCart = prev.find((i) => i.id === id);
+				if (isItemInCart) {
+					return prev.map((i) =>
+						i.id === id ? { ...i, quantity: i.quantity + 1 } : i
+					);
+				}
+				return [
+					...prev,
+					{ id, title, oldPrice, newPrice, image, quantity: 1,quan },
+				];
+			});
+		} else {
+			toast.error("لا يوجد كمية كافية من هذا المنتج", {
+				position: "top-center",
+				autoClose: 5000,
+				hideProgressBar: false,
+				closeOnClick: true,
+				pauseOnHover: true,
+				draggable: true,
+				progress: undefined,
+			});
+		}
 	};
 	const removeFromCart = (id) => {
 		setCartItems((prev) =>
@@ -83,12 +99,12 @@ const ShoppingCartProvider = ({ children }) => {
 				clearCart,
 				getCartTotal,
 				removeAllQuantity,
-                openCart,
-                closeCart
+				openCart,
+				closeCart,
 			}}
 		>
 			{children}
-			<ShoppingCart isOpen={isOpen}/>
+			<ShoppingCart isOpen={isOpen} />
 		</ShoppingCartContext.Provider>
 	);
 };

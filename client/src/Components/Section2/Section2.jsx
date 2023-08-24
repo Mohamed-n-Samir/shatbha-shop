@@ -37,7 +37,7 @@ const Section2 = () => {
 				<div className="d-flex justify-content-between align-items-center">
 					<hr
 						style={{
-							width: "45%",
+							width: "40%",
 						}}
 					/>
 					<h1 className="text-center">
@@ -49,7 +49,7 @@ const Section2 = () => {
 					</h1>
 					<hr
 						style={{
-							width: "45%",
+							width: "40%",
 						}}
 					/>
 				</div>
@@ -68,7 +68,7 @@ const Section2 = () => {
 				<div className="d-flex justify-content-between align-items-center">
 					<hr
 						style={{
-							width: "45%",
+							width: "40%",
 						}}
 					/>
 					<h1 className="text-center">
@@ -80,7 +80,7 @@ const Section2 = () => {
 					</h1>
 					<hr
 						style={{
-							width: "45%",
+							width: "40%",
 						}}
 					/>
 				</div>
@@ -100,7 +100,7 @@ const Section2 = () => {
 				<div className="d-flex justify-content-between align-items-center">
 					<hr
 						style={{
-							width: "45%",
+							width: "40%",
 						}}
 					/>
 					<h1 className="text-center">
@@ -112,7 +112,7 @@ const Section2 = () => {
 					</h1>
 					<hr
 						style={{
-							width: "45%",
+							width: "40%",
 						}}
 					/>
 				</div>
@@ -120,9 +120,9 @@ const Section2 = () => {
 					{data?.data?.products?.products?.map((item, index) => {
 						return (
 							<Col
-								className="mb-3"
+								className="mb-3 px-2"
 								key={index}
-								xs={12}
+								xs={6}
 								lg={4}
 								sm={6}
 								md={6}
@@ -136,6 +136,7 @@ const Section2 = () => {
 									title={item.title}
 									slug={item.slug}
 									id={item._id}
+									quantity={item.quantity}
 								/>
 							</Col>
 						);

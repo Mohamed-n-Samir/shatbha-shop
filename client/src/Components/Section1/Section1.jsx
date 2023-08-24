@@ -65,15 +65,15 @@ const Section1 = () => {
 				<Row className="py-5 ">
 					{data?.data?.offers?.map((item, index) => {
 						return <Col
-							className="mb-3"
+							className="mb-3 px-2"
 							key={index}
-							xs={12}
+							xs={6}
 							lg={4}
 							sm={6}
 							md={6}
 							xl={3}
 						>
-							<Card2 imgs={item.images} category={item.category.title} newPrice={item.newPrice} oldPrice={item.oldPrice} title={item.title} slug={item.slug} id={item._id}/>
+							<Card2 quantity={item.quantity} imgs={item.images} category={item.category.title} newPrice={item.newPrice} oldPrice={item.oldPrice} title={item.title} slug={item.slug} id={item._id}/>
 						</Col>;
 					})}
 				</Row>

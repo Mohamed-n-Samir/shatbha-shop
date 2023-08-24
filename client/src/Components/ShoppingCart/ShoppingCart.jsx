@@ -1,6 +1,7 @@
 import { Offcanvas,Stack } from "react-bootstrap";
 import { useShoppingCart } from "../../context/ShoppingCartContext";
 import CartItem from "../CartItem/CartItem";
+import { ToastContainer } from "react-toastify";
 
 const ShoppingCart = ({ isOpen }) => {
 	const {
@@ -23,6 +24,17 @@ const ShoppingCart = ({ isOpen }) => {
 			}}
 			backdropClassName="zIndex-9999"
 		>
+			<ToastContainer 
+				position="top-center"
+				autoClose={5000}
+				hideProgressBar={false}
+				closeOnClick
+				pauseOnHover
+				draggable
+				progress={undefined}
+				theme="dark"
+
+				/>
 			<Offcanvas.Header
 				closeButton
 				style={{
@@ -42,8 +54,9 @@ const ShoppingCart = ({ isOpen }) => {
                     top: "40%"
                 }}>العربه فارغه</h3>}
 				<Stack gap={3}>
-					{cartItems?.map((item) => (
-						<CartItem key={item.id} {...item} />
+					{cartItems?.map((item,index) => (
+						console.log(item),
+						<CartItem key={index} {...item} />
 					))}
                     {getCartTotal() > 0 && (
                         <div className="d-flex justify-content-between align-items-center">

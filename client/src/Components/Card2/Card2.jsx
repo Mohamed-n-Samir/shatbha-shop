@@ -3,15 +3,26 @@ import { Button, Row } from "react-bootstrap";
 import { FavoriteBorder } from "@mui/icons-material";
 import { Link } from "react-router-dom";
 import { useShoppingCart } from "../../context/ShoppingCartContext";
+import { Toast } from "react-bootstrap";
 import "./card2.css";
 
-const Card2 = ({ imgs, title, oldPrice, newPrice, category, slug, id }) => {
+const Card2 = ({
+	imgs,
+	title,
+	oldPrice,
+	newPrice,
+	category,
+	slug,
+	id,
+	quantity: quan,
+}) => {
 	const [img, setImg] = useState(imgs[0].url);
-	const { addToCart, getItemsQuantity, removeFromCart,removeAllQuantity } = useShoppingCart();
+	const { addToCart, getItemsQuantity, removeFromCart, removeAllQuantity } =
+		useShoppingCart();
 	const quantity = getItemsQuantity(id);
 	return (
 		<div className="card2">
-			<Link to={`/product/${slug}`}>
+			<Link to={`/products/${slug}`}>
 				<div
 					className="card2-imgs"
 					style={{
@@ -44,6 +55,7 @@ const Card2 = ({ imgs, title, oldPrice, newPrice, category, slug, id }) => {
 							`EGP${oldPrice.toLocaleString("en-US")}.00`
 						)}
 					</h2>
+					<p className="px-2 ">الكمية المتبقيه : {quan - quantity}</p>
 				</div>
 			</Link>
 
@@ -53,42 +65,57 @@ const Card2 = ({ imgs, title, oldPrice, newPrice, category, slug, id }) => {
 						className="py-4 px-5 fs-4 btn-dark fw-bold"
 						onClick={() => {
 							console.log(id);
-							addToCart({id,title,oldPrice,newPrice,image:imgs[0].url});
+							addToCart({
+								id,
+								title,
+								oldPrice,
+								newPrice,
+								image: imgs[0].url,
+								quan,
+							});
 						}}
 					>
 						إضافة إلى السلة
 					</Button>
 				) : (
 					<>
-					<div className="mb-3">
-						<div className="d-flex align-items-center justify-content-center gap-3">
-							<Button
-								className="fs-4"
-								variant="dark"
-								onClick={() => addToCart({id,title,oldPrice,newPrice})}
-							>
-								+
-							</Button>
-							<span className="fs-3">{quantity}</span>
-							<Button
-								className="fs-4"
-								variant="dark"
-								onClick={() => removeFromCart(id)}
-							>
-								-
-							</Button>
+						<div className="mb-3">
+							<div className="d-flex align-items-center justify-content-center gap-3">
+								<Button
+									className="fs-4"
+									variant="dark"
+									onClick={() =>
+										addToCart({
+											id,
+											title,
+											oldPrice,
+											newPrice,
+											quan,
+										})
+									}
+								>
+									+
+								</Button>
+								<span className="fs-3">{quantity}</span>
+								<Button
+									className="fs-4"
+									variant="dark"
+									onClick={() => removeFromCart(id)}
+								>
+									-
+								</Button>
+							</div>
 						</div>
-					</div>
-					<Button
-						variant="outline-danger"
-						className="py-4 px-5 fs-4 fw-bold"
-						onClick={() => {
-							console.log(id);
-							removeAllQuantity(id);
-						}}
-					>
-						حذف من السلة
-					</Button>
+						<Button
+							variant="outline-danger"
+							className="py-4 px-5 fs-4 fw-bold"
+							onClick={() => {
+								console.log(id);
+								removeAllQuantity(id);
+							}}
+						>
+							حذف من السلة
+						</Button>
 					</>
 				)}
 

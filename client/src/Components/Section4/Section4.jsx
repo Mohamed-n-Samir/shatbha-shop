@@ -36,13 +36,13 @@ const Section4 = () => {
 			<section className="section-1">
 				<div className="d-flex justify-content-between align-items-center">
 					<hr style={{
-                        width:"45%"
+                        width:"40%"
                     }}/>
 					<h1 className="text-center">
 						<BathtubIcon  fontSize="x-large"/>
 					</h1>
 					<hr style={{
-                        width:"45%"
+                        width:"40%"
                     }}/>
 				</div>
 				<div className="is-loading">
@@ -59,13 +59,13 @@ const Section4 = () => {
 			<section className="section-1">
 				<div className="d-flex justify-content-between align-items-center">
 					<hr style={{
-                        width:"45%"
+                        width:"40%"
                     }}/>
 					<h1 className="text-center">
 						<BathtubIcon  fontSize="x-large" />
 					</h1>
 					<hr style={{
-                        width:"45%"
+                        width:"40%"
                     }}/>
 				</div>
 
@@ -83,26 +83,26 @@ const Section4 = () => {
 			<section className="section-1">
 				<div className="d-flex justify-content-between align-items-center">
 					<hr style={{
-                        width:"45%"
+                        width:"40%"
                     }}/>
 					<h1 className="text-center">
 						<BathtubIcon fontSize="x-large" />
 					</h1>
 					<hr style={{
-                        width:"45%"
+                        width:"40%"
                     }}/>
 				</div>
 				<Row className="py-5 ">
 					{data?.data?.products?.products?.map((item, index) => {
 						return (
 							<Col
-								className="mb-3"
-								key={index}
-								xs={12}
-								lg={4}
-								sm={6}
-								md={6}
-								xl={3}
+							className="mb-3 px-2"
+							key={index}
+							xs={6}
+							lg={4}
+							sm={6}
+							md={6}
+							xl={3}
 							>
 								<Card2
 									imgs={item.images}
@@ -112,6 +112,7 @@ const Section4 = () => {
 									title={item.title}
 									slug={item.slug}
 									id={item._id}
+									quantity={item.quantity}
 								/>
 							</Col>
 						);

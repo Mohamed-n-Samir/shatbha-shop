@@ -21,6 +21,7 @@ const Layout = ({
 	robots,
 	canonicalUrl,
 	preloadImages,
+	className
 }) => {
 	// const schema = {
 	// 	"@context": "https://schema.org",
@@ -137,7 +138,7 @@ const Layout = ({
 				</Helmet>
 				<Navbar1 />
 				<Navbar2 />
-				<div className="layout-container">{children}</div>
+				<div className={`${className} layout-container`}>{children}</div>
 				<LazyFooter />
 				<Suspense>
 					<GoToTop />

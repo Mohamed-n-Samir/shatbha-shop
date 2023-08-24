@@ -3,7 +3,6 @@
     box-shadow: 0 0 10px rgba(0,0,0,0.2);
     border-radius: .7rem;
     transition: all .3s ease-in-out;
-    min-height: 62rem;
 }
 
 .card2:hover {
@@ -20,6 +19,8 @@
     font-weight: 400;
     color: #000;
     margin-bottom: 1rem;
+    width: 100%;
+    text-align: center;
 }
 
 .old-price {
@@ -27,3 +28,11 @@
     color: #999;
     font-weight: 400;
 }
+
+
+@media screen and (max-width: 500px) {
+    .card2 h2 {
+        font-size: 1.2rem;
+    }
+}
+    

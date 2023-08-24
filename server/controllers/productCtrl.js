@@ -116,16 +116,20 @@ const deleteProduct = async (req, res) => {
 	}
 };
 
-const getaProduct = asyncHandler(async (req, res) => {
-	const { id } = req.params;
-	validateMongoDbId(id);
+const getaProduct = async (req, res) => {
+	const { slug } = req.params;
+
+	console.log(slug)
+
+	if(!slug) 
+		return res.status(422).json({ error: "المنتج غير موجود" });
 	try {
-		const findProduct = await Product.findById(id);
-		res.json(findProduct);
+		const findProduct = await Product.findOne({slug: slug}).populate("category").populate("brand");
+		res.status(200).json(findProduct);
 	} catch (error) {
-		throw new Error(error);
+		res.status(500).json({ error: error.message });
 	}
-});
+};
 
 const getAllProduct = asyncHandler(async (req, res) => {
 	try {
@@ -138,81 +142,6 @@ const getAllProduct = asyncHandler(async (req, res) => {
 		throw new Error(error);
 	}
 });
-
-// const getAllProduct1 = async (req, res) => {
-// 	try {
-// 		// Filtering
-// 		const queryObj = { ...req.query };
-// 		const excludeFields = ["page", "sort", "limit", "fields"];
-// 		let queryStr;
-// 		let query;
-// 		if (queryObj) {
-// 			excludeFields.forEach((el) => delete queryObj[el]);
-// 			queryStr = JSON.stringify(queryObj);
-// 			queryStr = queryStr.replace(
-// 				/\b(gte|gt|lte|lt)\b/g,
-// 				(match) => `$${match}`
-// 			);
-
-// 			if (req.query.title) {
-// 				console.log(JSON.parse(queryStr))
-// 				query = Product.find({
-// 					...JSON.parse(queryStr),
-// 					title: new RegExp(req.query.title, "i"),
-// 				}).populate("category");
-// 			} else {
-// 				console.log(JSON.parse(queryStr))
-// 				query = Product.find(JSON.parse(queryStr)).populate("category");
-// 			}
-// 		}
-
-// 		// Sorting
-
-// 		if (req.query.sort) {
-// 			const sortBy = req.query.sort.split(",").join(" ");
-// 			query = query.sort(sortBy);
-// 		} else {
-// 			query = query.sort("-createdAt");
-// 		}
-
-// 		// limiting the fields
-
-// 		if (req.query.fields) {
-// 			const fields = req.query.fields.split(",").join(" ");
-// 			query = query.select(fields);
-// 		} else {
-// 			query = query.select("-__v");
-// 		}
-
-// 		const productCount = await Product.find(query).countDocuments();
-
-// 		// pagination
-
-// 		// let productCount = 12
-
-// 		const page = req.query.page || 1;
-// 		const limit = req.query.limit || 5;
-// 		const skip = (page - 1) * limit;
-// 		query = query.skip(skip).limit(limit);
-
-// 		console.log("halawa");
-
-// 		if (skip >= productCount && page > 1)
-// 			return res.status(404).json({ message: "هذه الصفحه غير موجوده" });
-
-// 		const products = await query;
-// 		// console.log(products.length);
-// 		res.status(200).json({
-// 			products: {
-// 				productCount,
-// 				products,
-// 			},
-// 		});
-// 	} catch (error) {
-// 		console.log(error);
-// 		return res.status(500).json({ error: error.message });
-// 	}
-// };
 
 const getAllProduct1 = async (req, res) => {
 	try {
@@ -442,25 +371,6 @@ const test = async (req, res) => {
 			match: { title: "إكسسوارات" },
 		});
 		res.status(200).json({ product });
-		// const product = await Product.find({
-		// 	$or: [
-		// 		{
-		// 			tags: {
-		// 				$elemMatch: {
-		// 					$in: await SubCategory.find({
-		// 						category: "64dfcf2aa4724030ed2e80e8",
-		// 					}).distinct("subCategory"),
-		// 				},
-		// 			},
-		// 		},
-		// 		{
-		// 			category: "64dfcf2aa4724030ed2e80e8",
-		// 		},
-		// 	],
-		// });
-		// console.log(product.length);
-
-		// return res.status(200).json({ product });
 	} catch (error) {
 		console.log("halawatayn");
 		console.log(error.message);
@@ -479,4 +389,5 @@ module.exports = {
 	getOffers,
 	getAllProduct1,
 	test,
+	getaProduct
 };

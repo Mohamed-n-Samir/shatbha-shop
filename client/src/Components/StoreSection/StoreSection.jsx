@@ -223,7 +223,7 @@ const StoreSection = ({ gte, lte, sort, setItemsNubmer }) => {
 					من أصل {data?.data?.products?.productCount} نتيجة
 				</p>
 				<section>
-					<Row className="px-4">
+					<Row className="">
 						{data?.data?.products?.products?.map((item, index) => {
 							// console.log(item);
 							return (
@@ -231,13 +231,13 @@ const StoreSection = ({ gte, lte, sort, setItemsNubmer }) => {
 									style={{
 										minHeight: "60rem",
 									}}
-									className="mb-3"
 									key={index}
-									xs={12}
+									className="mb-3 px-2"
+									xs={6}
 									lg={4}
 									sm={6}
 									md={6}
-									// xl={3}
+									xl={3}
 								>
 									<Card2
 										imgs={item.images}
@@ -247,6 +247,7 @@ const StoreSection = ({ gte, lte, sort, setItemsNubmer }) => {
 										title={item.title}
 										slug={item.slug}
 										id={item._id}
+										quantity={item.quantity}
 									/>
 								</Col>
 							);

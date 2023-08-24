@@ -20,6 +20,7 @@ const Category = lazy(() => import("../pages/category/Category"));
 const Brands = lazy(() => import("../pages/brands/Brands"));
 const SubCategory = lazy(() => import("../pages/subCategory/SubCategory"));
 const Store = lazy(() => import("../pages/store/Store"));
+const Product = lazy(() => import("../pages/product/Product"));
 const Search = lazy(() => import("../pages/search/Search"));
 const PrivateRoute = lazy(() => import("./utils/PrivateRoute/PrivateRoute"));
 
@@ -34,7 +35,7 @@ function App() {
 				<Route path="login" element={<Login />} exact />
 				<Route path="products" exact>
 					<Route index element={<Store />} />
-					{/* <Route path=":slug" element={<Login />} exact /> */}
+					<Route path=":slug" element={<Product />} exact />
 				</Route>
 				<Route element={<PrivateRoute />}>
 					<Route path="dashboard" element={<Dashboard />} exact />
