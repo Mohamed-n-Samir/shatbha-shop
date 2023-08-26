@@ -46,7 +46,7 @@ const Navbar1 = () => {
 						</li>
 						<li className="link">
 							<NavLink
-								to="/blogs"
+								to="/product-category/64dbec41fe92923b352651e7"
 								className={({ isActive }) =>
 									isActive ? activeStyle : undefined
 								}
@@ -56,7 +56,7 @@ const Navbar1 = () => {
 						</li>
 						<li className="link">
 							<NavLink
-								to="/lectures"
+								to="/product-categroy/64daa81fa29f411cd39e4251"
 								className={({ isActive }) =>
 									isActive ? activeStyle : undefined
 								}
@@ -89,7 +89,7 @@ const Navbar1 = () => {
 								padding: "0 0 0 1.5rem",
 							}}
 						>
-							<DropDown title={"حسابي"} />
+							<DropDown  />
 						</li>
 						<li className="link ">
 							<Button

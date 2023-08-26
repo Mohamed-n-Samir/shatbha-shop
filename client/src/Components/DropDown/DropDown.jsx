@@ -1,11 +1,11 @@
 import { Link } from "react-router-dom";
 import { useDataProvider } from "../../hooks/useDataProvider";
-import {useLogout} from "../../hooks/useLogout";
+import { useLogout } from "../../hooks/useLogout";
 import "./drop-down-item.css";
 
 const DropDown = () => {
 	const { user } = useDataProvider();
-	const {logout} = useLogout();
+	const { logout } = useLogout();
 
 	return (
 		<div className="btn-group">
@@ -38,16 +38,6 @@ const DropDown = () => {
 						</Link>
 					</li>
 				)}
-				<li className="drop-down-item">
-					<Link className="dropdown-item" to="/orders">
-						الطلبات
-					</Link>
-				</li>
-				<li className="drop-down-item">
-					<Link className="dropdown-item" to="/wishlist">
-						منتجاتي المفضله
-					</Link>
-				</li>
 				{user === "none" || !user ? (
 					<>
 						<li className="drop-down-item">
@@ -62,17 +52,29 @@ const DropDown = () => {
 						</li>
 					</>
 				) : (
-					<li className="drop-down-item">
-						<Link
-							className="dropdown-item"
-							onClick={(e) => {
-								e.preventDefault();
-								logout();
-							}}
-						>
-							تسجيل الخروج
-						</Link>
-					</li>
+					<>
+						<li className="drop-down-item">
+							<Link className="dropdown-item" to="/orders">
+								الطلبات
+							</Link>
+						</li>
+						<li className="drop-down-item">
+							<Link className="dropdown-item" to="/wishlist">
+								منتجاتي المفضله
+							</Link>
+						</li>
+						<li className="drop-down-item">
+							<Link
+								className="dropdown-item"
+								onClick={(e) => {
+									e.preventDefault();
+									logout();
+								}}
+							>
+								تسجيل الخروج
+							</Link>
+						</li>
+					</>
 				)}
 			</ul>
 		</div>

@@ -3,17 +3,19 @@ import { Row, Col, Button } from "react-bootstrap";
 import { useAsyncError, useParams } from "react-router-dom";
 import useQueryCustom from "../../hooks/useQueryCustom";
 import HashLoader from "react-spinners/HashLoader";
-import { Link,useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useShoppingCart } from "../../context/ShoppingCartContext";
 import { ReactComponent as Whats } from "../../assets/icons/whats.svg";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import { ReactComponent as Facebook } from "../../assets/icons/facebook.svg";
+import Section2Product from "../Section2Product/Section2Product";
+import Section3Product from "../Section3Product/Section3Product";
 import "./sec-1-product.css";
 
 const Section1Product = () => {
 	const { slug } = useParams();
 	const [image, setImage] = useState(null);
-    const navigate = useNavigate();
+	const navigate = useNavigate();
 
 	const { addToCart, removeFromCart, getItemsQuantity, removeAllQuantity } =
 		useShoppingCart();
@@ -61,10 +63,8 @@ const Section1Product = () => {
 			images,
 			description,
 			tags,
-            quantity:quan,
+			quantity: quan,
 		} = data?.data;
-
-		console.log(tags);
 
 		return (
 			<main>
@@ -240,7 +240,8 @@ const Section1Product = () => {
 													oldPrice,
 													newPrice,
 													image: images[0].url,
-                                                    quan,
+													quan,
+													slug,
 												});
 											}}
 										>
@@ -261,7 +262,8 @@ const Section1Product = () => {
 												oldPrice,
 												newPrice,
 												image: images[0].url,
-                                                quan,
+												quan,
+												slug,
 											});
 										}}
 									>
@@ -328,18 +330,29 @@ const Section1Product = () => {
 							<hr />
 						</Col>
 					</Row>
-					<div className="d-flex align-items-center gap-4 mt-4">
+					<div className="d-flex align-items-center gap-4 my-5">
 						<h1 className="">مشاركة على: </h1>
-						<Button variant="d-flex align-items-center fs-3 fw-bold text-white px-4" style={{
-                            backgroundColor:"#3262c9",
-                        }}
-                        onClick={()=> {
-                            window.open(`https://www.facebook.com/share.php?u=${window.location.href}`, "", "toolbar=yes,scrollbars=yes,resizable=yes,top=500,left=500,width=400,height=400")
-                        }}>
+						<Button
+							variant="d-flex align-items-center fs-3 fw-bold text-white px-4"
+							style={{
+								backgroundColor: "#3262c9",
+							}}
+							onClick={() => {
+								window.open(
+									`https://www.facebook.com/share.php?u=${window.location.href}`,
+									"",
+									"toolbar=yes,scrollbars=yes,resizable=yes,top=500,left=500,width=400,height=400"
+								);
+							}}
+						>
 							Facebook
 						</Button>
 					</div>
 				</section>
+				<Section2Product description={description} />
+				<Section3Product
+					tag={tags[Math.floor(Math.random() * tags.length)]}
+				/>
 			</main>
 		);
 	}

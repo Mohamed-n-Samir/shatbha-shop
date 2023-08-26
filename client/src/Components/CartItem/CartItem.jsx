@@ -1,8 +1,16 @@
 import { Button, Stack } from "react-bootstrap";
 import { useShoppingCart } from "../../context/ShoppingCartContext";
-import { useNavigate } from "react-router-dom";
 
-const CartItem = ({ id, quantity, title, image, oldPrice, newPrice, quan,slug }) => {
+const CartItem = ({
+	id,
+	quantity,
+	title,
+	image,
+	oldPrice,
+	newPrice,
+	quan,
+	slug,
+}) => {
 	const { removeAllQuantity, addToCart, removeFromCart } = useShoppingCart();
 	// const navigate = useNavigate();
 	return (
@@ -10,25 +18,25 @@ const CartItem = ({ id, quantity, title, image, oldPrice, newPrice, quan,slug })
 			direction="horizontal"
 			gap={2}
 			className="d-flex align-items-center"
-            style={{
-                borderBottom: "1px solid #ddd",
-                borderRadius: "10px",
-                paddingBottom: "1rem"
-            }}
+			style={{
+				borderBottom: "1px solid #ddd",
+				borderRadius: "10px",
+				paddingBottom: "1rem",
+			}}
 		>
-			<img
-				src={image}
-				alt={title}
-				style={{
-					width: "100px",
-					height: "100px",
-					objectFit: "cover",
-					borderRadius: "10px",
-				}}
-				onClick={() => {
-					// navigate(`/products/${slug}`);
-				}}
-			/>
+			<a href={`/products/${slug}`}>
+				<img
+					src={image}
+					alt={title}
+					style={{
+						width: "100px",
+						height: "100px",
+						objectFit: "cover",
+						borderRadius: "10px",
+					}}
+				/>
+			</a>
+
 			<div className="fs-5 ms-auto">
 				<div>
 					{title
@@ -45,6 +53,7 @@ const CartItem = ({ id, quantity, title, image, oldPrice, newPrice, quan,slug })
 									newPrice,
 									image,
 									quan,
+									slug,
 								});
 							}}
 						>

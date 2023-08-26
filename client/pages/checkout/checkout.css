@@ -1,0 +1,19 @@
+.form-check-input[type=checkbox],.form-check-input[type=radio] {
+    width: 1.5rem;
+    height: 1.5rem;
+    margin: 0;
+}
+
+.form-add input:not([type="radio"]) {
+	padding: 1rem;
+	font-size: 1.2rem;
+}
+
+.form-select {
+	--bs-form-select-bg-img: "";
+	appearance: auto;
+}
+
+.form-select option {
+	font-size: 1.4rem;
+}

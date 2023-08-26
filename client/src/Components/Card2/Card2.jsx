@@ -72,6 +72,7 @@ const Card2 = ({
 								newPrice,
 								image: imgs[0].url,
 								quan,
+								slug,
 							});
 						}}
 					>
@@ -91,6 +92,7 @@ const Card2 = ({
 											oldPrice,
 											newPrice,
 											quan,
+											slug,
 										})
 									}
 								>

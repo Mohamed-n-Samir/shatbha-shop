@@ -40,7 +40,7 @@ const ShoppingCartProvider = ({ children }) => {
 				}
 				return [
 					...prev,
-					{ id, title, oldPrice, newPrice, image, quantity: 1,quan },
+					{ id, title, oldPrice, newPrice, image, quantity: 1,quan,slug },
 				];
 			});
 		} else {
