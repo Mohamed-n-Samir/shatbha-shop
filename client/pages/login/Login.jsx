@@ -11,15 +11,37 @@ const Login = () => {
 	// 	query: "(max-width: 600px)",
 	// });
 
-	if(user !== "none" && user){
-		return <Navigate to="/" replace={true}/>
-	}else {
+	if (user !== "none" && user) {
+		return <Navigate to="/" replace={true} />;
+	} else {
 		return (
-			<Layout>
+			<Layout
+				robots={true}
+				canonicalUrl={`/login`}
+				ogUrl={`/login`}
+				ogTitle={
+					"تسجيل الدخول - Shatbha Shop | شطبها شوب"
+				}
+				ogDescription={
+					"سجل دخول لحسابك في متجر شطبها شوب لتتمكن من إدارة طلباتك و المنتجات و معلوماتك الشخصية"
+				}
+				title={
+					"تسجيل الدخول - Shatbha Shop | شطبها شوب"
+				}
+				description={
+					"سجل دخول لحسابك في متجر شطبها شوب لتتمكن من إدارة طلباتك و المنتجات و معلوماتك الشخصية"
+				}
+				ogImage={"smallbitmap.svg"}
+				msapplicationTileImage={"smallbitmap.svg"}
+				author={"Shatbha Shop | شطبها شوب"}
+				keywords={
+					"تسجيل دخول, متجر مستلزمات السباكة و الأدوات الصحية و أنظمة المياه, خلاطات المياه, أحواض المطبخ, ديكور المطبخ, الحمام, أطقم المرحاض, حوض الحمام"
+				}
+			>
 				<LoginForm />
 			</Layout>
 		);
-	} 
+	}
 };
 
 export default Login;

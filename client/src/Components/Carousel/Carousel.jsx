@@ -7,7 +7,7 @@ function CarouselFade() {
 			<Carousel.Item>
 				<img
 					className="d-block w-100 object-fit-cover object-position-center"
-					src="./خلفية-عرض-التجديد2.webp"
+					src="https://ik.imagekit.io/shatbhashop/shatbha-shop-carousel/1.jpg"
 					alt="First slide"
 				/>
 				{/* <Carousel.Caption>
@@ -21,7 +21,7 @@ function CarouselFade() {
 			<Carousel.Item>
 				<img
 					className="d-block w-100 object-fit-cover object-position-center"
-					src="./SebakaShop-Black-bathroom-cover.webp"
+					src="https://ik.imagekit.io/shatbhashop/shatbha-shop-carousel/2.jpg"
 					alt="First slide"
 				/>
 				{/* <Carousel.Caption>
@@ -34,7 +34,7 @@ function CarouselFade() {
 			<Carousel.Item>
 				<img
 					className="d-block w-100 object-fit-cover object-position-center"
-					src="./SebakaShop-Kitchen-Sinks.webp"
+					src="https://ik.imagekit.io/shatbhashop/shatbha-shop-carousel/3.jpg"
 					alt="First slide"
 				/>
 				{/* <Carousel.Caption>

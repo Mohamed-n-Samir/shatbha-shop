@@ -1,0 +1,12 @@
+/* tr > * {
+    padding: 1rem 0.2rem !important;
+    border: 1px solid #ccc;
+    text-align: center;
+} */
+
+@media screen and (max-width: 600px) {
+.mytable-col{
+    max-width: 370px !important;
+}
+}
+    

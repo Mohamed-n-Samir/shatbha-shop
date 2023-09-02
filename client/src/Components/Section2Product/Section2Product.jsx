@@ -1,7 +1,12 @@
 import { Link } from "react-router-dom";
 import { Tab, Tabs } from "react-bootstrap";
 
-const Section2Product = ({ description }) => {
+const URL_REGEX =
+	/^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/gm;
+
+
+const Section2Product = ({ description, brand }) => {
+	console.log(brand);
 	return (
 		<section className="container">
 			<Tabs
@@ -10,6 +15,41 @@ const Section2Product = ({ description }) => {
 				className="my-5 fs-2 "
 			>
 				<Tab eventKey="description" title="الوصف">
+					{brand && (
+						<section>
+							{brand.url.match(URL_REGEX) ? (
+								<>
+									<Link
+										to={brand.url}
+										style={{
+											textDecoration: "none",
+										}}
+									>
+										<h1 className="text-center fs-2">
+											{brand.name}
+										</h1>
+									</Link>
+								</>
+							) : (
+								<h1 className="text-center fs-2">
+									{brand.name}
+								</h1>
+							)}
+							<p
+								style={{
+									fontSize: "1.6rem",
+									width: "70%",
+									minWidth: "35rem",
+									margin: "auto",
+									lineHeight: "4rem",
+									marginBottom: "4rem",
+								}}
+								className="d-flex justify-content-center align-items-center text-center"
+							>
+								{brand.description}
+							</p>
+						</section>
+					)}
 					<pre
 						style={{
 							fontFamily: "inherit",

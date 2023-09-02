@@ -9,7 +9,6 @@ import useQueryCustom from "../../src/hooks/useQueryCustom";
 import useMutationCustom from "../../src/hooks/useMutationCustom";
 import HashLoader from "react-spinners/HashLoader";
 import { toast } from "react-toastify";
-
 import "./checkout.css";
 
 const Checkout = () => {
@@ -19,12 +18,15 @@ const Checkout = () => {
 	if (user === "none" || !user) {
 		navigate("/login");
 	}
-	const { cartItems, getCartTotal } = useShoppingCart();
+	const { cartItems, getCartTotal, clearCart } = useShoppingCart();
 	const [termCheck, setTermCheck] = useState(true);
 	const [addressCheck, setAddressCheck] = useState(false);
 	const [radio, setRadio] = useState("pwr"); //pay when recive   (visa) pay with bank card
 	const [form, setForm] = useState({
-		products: cartItems.map(({ id, quantity }) => ({ _id: id, quantity })),
+		products: cartItems.map(({ id, quantity }) => ({
+			product: id,
+			quantity,
+		})),
 		city: "",
 		area: "",
 		buildingAndApartment: "",
@@ -56,7 +58,8 @@ const Checkout = () => {
 					progress: undefined,
 					theme: "dark",
 				});
-				queryClient.invalidateQueries("brands-table-data");
+				clearCart();
+				navigate("/orders");
 			}
 		},
 	});
@@ -82,7 +85,7 @@ const Checkout = () => {
 				progress: undefined,
 				theme: "dark",
 			});
-		} else if (addressCheck && form.area) {
+		} else if (addressCheck && form.area === "") {
 			return toast.error("المنطقه لا يمكن ان تكون فارغه", {
 				position: "top-center",
 				autoClose: 5000,
@@ -93,7 +96,7 @@ const Checkout = () => {
 				progress: undefined,
 				theme: "dark",
 			});
-		} else if (addressCheck && form.area) {
+		} else if (addressCheck && form.buildingAndApartment === "") {
 			return toast.error("المبني و الشقه لا يمكن ان تكون فارغه", {
 				position: "top-center",
 				autoClose: 5000,
@@ -108,17 +111,31 @@ const Checkout = () => {
 			console.log(form);
 			if (radio === "pwr") {
 				console.log("pwr");
-			} else if (radio === "visa") {
-				console.log("visa");
+				mutate(["createOrder", form]);
 			}
-			mutate(['createOrder',form])
-			
+			// else if (radio === "visa") {
+			// 	console.log("visa");
+			// 	mutate(["createOrderVisa", form]);
+			// }
 		}
 	};
 
 	if (cartItems.length > 0) {
 		return (
-			<Layout>
+			<Layout
+				robots={false}
+				canonicalUrl={`/checkout`}
+				ogUrl={`/checkout`}
+				ogTitle={"اتمام الطلب - Shatbha Shop | شطبها شوب"}
+				ogDescription={
+					"اتمام عملية الشراء من متجر مستلزمات السباكة و الأدوات الصحية و أنظمة المياه - Shatbha Shop | شطبها شوب "
+				}
+				title={"اتمام الطلب - Shatbha Shop | شطبها شوب"}
+				description={
+					"اتمام عملية الشراء من متجر مستلزمات السباكة و الأدوات الصحية و أنظمة المياه - Shatbha Shop | شطبها شوب "
+				}
+				msapplicationTileImage={"smallbitmap.svg"}
+			>
 				<header className=" bg-secondary py-5" style={{}}>
 					<div className="container d-flex justify-content-around align-items-center">
 						<h1
@@ -134,10 +151,10 @@ const Checkout = () => {
 					</div>
 				</header>
 				<main className="container pt-5">
-					<Row>
-						<Col className="px-5">
+					<Row className="">
+						<Col lg={6} sm={12} xs={12} className="p-5">
 							<h3 className="pt-5">تفاصيل الفاتورة</h3>
-							<hr className="w-" />
+							<hr />
 							<div className="">
 								<Form.Group className="d-flex align-items-center gap-3 mt-5">
 									<Form.Check
@@ -190,19 +207,25 @@ const Checkout = () => {
 													المدينه الخاصه بك فلا يوجد
 													خدمه شحن لها)
 												</option>
-												{data?.data?.map((city) => {
-													return (
-														city.name !==
-															"Admin" && (
-															<option
-																value={city._id}
-																key={city._id}
-															>
-																{city.name}
-															</option>
-														)
-													);
-												})}
+												{data?.data?.allCities?.map(
+													(city) => {
+														return (
+															city.name !==
+																"Admin" && (
+																<option
+																	value={
+																		city._id
+																	}
+																	key={
+																		city._id
+																	}
+																>
+																	{city.name}
+																</option>
+															)
+														);
+													}
+												)}
 											</Form.Select>
 										</Form.Group>
 										<Form.Group controlId="area">
@@ -249,7 +272,7 @@ const Checkout = () => {
 								</Form.Group>
 							</div>
 						</Col>
-						<Col className="px-5">
+						<Col lg={6} sm={12} xs={12} className="px-5">
 							<div
 								className="talabak d-flex justify-content-between flex-column bg-white p-5 rounded"
 								style={{
@@ -283,7 +306,7 @@ const Checkout = () => {
 								})}
 								<div className="d-flex justify-content-between align-items-center mt-5">
 									<h4>المجموع الكلي</h4>
-									<h4>{getCartTotal()}</h4>
+									<h4>{`${getCartTotal()}.00 EGP`}</h4>
 								</div>
 								<hr className="mt-5" />
 								<div className="d-flex justify-content-between align-items-center mt-5">
@@ -291,9 +314,9 @@ const Checkout = () => {
 									<h4 className="w-50 text-center">
 										استلام عند{" "}
 										{form.city === "" || form.area === ""
-											? `${user.city.name}/${user.area}/${user.buildingAndApartment}`
+											? `${user?.city?.name}/${user?.area}/${user?.buildingAndApartment}`
 											: `${
-													data?.data?.find(
+													data?.data?.allCities?.find(
 														(obj) =>
 															obj._id ===
 															form.city
@@ -302,7 +325,7 @@ const Checkout = () => {
 													form.buildingAndApartment
 											  }`}{" "}
 										<span className="d-block mt-3">
-											EGP {user.city.shippingCharge}.00
+											EGP {user?.city?.shippingCharge}.00
 										</span>
 									</h4>
 								</div>
@@ -310,8 +333,10 @@ const Checkout = () => {
 								<div className="d-flex justify-content-between align-items-center mt-5">
 									<h4>الإجمالي</h4>
 									<h4>
-										{getCartTotal() +
-											user.city.shippingCharge}
+										{`${
+											getCartTotal() +
+											user?.city?.shippingCharge
+										}.00 EGP`}
 									</h4>
 								</div>
 								<hr className="mt-5" />
@@ -343,13 +368,14 @@ const Checkout = () => {
 												name="payment"
 												id="pay2"
 												value={"visa"}
-												onChange={handleRadioChange}
+												disabled
+												// onChange={handleRadioChange}
 											/>
 											<Form.Label
 												htmlFor="pay2"
 												className="fs-4"
 											>
-												دفع بالبطاقه البنكيه
+												دفع بالبطاقه البنكيه (قريباً)
 											</Form.Label>
 										</Form.Group>
 									</Form>
@@ -379,9 +405,18 @@ const Checkout = () => {
 										وأوافق عليها لهذا الموقع
 									</Form.Label>
 								</Form.Group>
+								{mutateLoading && (
+									<div className="d-flex justify-content-center align-items-center p-5">
+										<HashLoader
+											loading={mutateLoading}
+											size={40}
+										/>
+									</div>
+								)}
+
 								<Button
 									variant="dark mt-2 p-4 fs-4"
-									disabled={termCheck}
+									disabled={termCheck || mutateLoading}
 									onClick={handleSubmit}
 								>
 									تأكيد الطلب
@@ -394,13 +429,29 @@ const Checkout = () => {
 		);
 	} else {
 		return (
-			<Layout>
+			<Layout
+				robots={false}
+				canonicalUrl={`/checkout`}
+				ogUrl={`/checkout`}
+				ogTitle={"اتمام الطلب - Shatbha Shop | شطبها شوب"}
+				ogDescription={
+					"اتمام عملية الشراء من متجر مستلزمات السباكة و الأدوات الصحية و أنظمة المياه - Shatbha Shop | شطبها شوب "
+				}
+				title={"اتمام الطلب - Shatbha Shop | شطبها شوب"}
+				description={
+					"اتمام عملية الشراء من متجر مستلزمات السباكة و الأدوات الصحية و أنظمة المياه - Shatbha Shop | شطبها شوب "
+				}
+				msapplicationTileImage={"smallbitmap.svg"}
+			>
 				<div className="d-flex justify-content-center align-items-center flex-column gap-5 p-5">
 					{" "}
 					<h3>سلة مشترياتك فارغة حاليًا.</h3>
-					<Button variant="dark py-3 px-4 fs-4" onClick={()=> {
-						navigate("/products")
-					}}>
+					<Button
+						variant="dark py-3 px-4 fs-4"
+						onClick={() => {
+							navigate("/products");
+						}}
+					>
 						العودة إلى المتجر
 					</Button>
 				</div>

@@ -21,7 +21,8 @@ const Layout = ({
 	robots,
 	canonicalUrl,
 	preloadImages,
-	className
+	className,
+	schema,
 }) => {
 	// const schema = {
 	// 	"@context": "https://schema.org",
@@ -106,6 +107,10 @@ const Layout = ({
 					<meta name="author" content={author} />
 					<meta property="og:description" content={ogDescription} />
 					<meta property="og:title" content={ogTitle} />
+					<meta
+						property="og:site_name"
+						content={"Shatbha Shop | شطبها شوب"}
+					/>
 					<link
 						rel="canonical"
 						href={`http://localhost:5173${canonicalUrl}`}
@@ -125,11 +130,14 @@ const Layout = ({
 					<meta property="og:type" content="website" />
 					<meta property="og:image:type" content="image/jpeg" />
 					{robots ? (
-						<meta name="robots" content="index, follow" />
+						<meta
+							name="robots"
+							content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+						/>
 					) : (
 						<meta
 							name="robots"
-							content="noindex, nofollow,noarchive,nosnippet"
+							content="noindex, follow,noarchive,nosnippet"
 						/>
 					)}
 					{/* <script type="application/ld+json">
@@ -138,7 +146,9 @@ const Layout = ({
 				</Helmet>
 				<Navbar1 />
 				<Navbar2 />
-				<div className={`${className} layout-container`}>{children}</div>
+				<div className={`${className} layout-container`}>
+					{children}
+				</div>
 				<LazyFooter />
 				<Suspense>
 					<GoToTop />

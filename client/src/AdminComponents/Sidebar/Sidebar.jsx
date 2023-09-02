@@ -9,6 +9,7 @@ import NewspaperIcon from "@mui/icons-material/Newspaper";
 import ProductionQuantityLimitsIcon from '@mui/icons-material/ProductionQuantityLimits';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import BrandingWatermarkIcon from '@mui/icons-material/BrandingWatermark';
+import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import CategoryIcon from '@mui/icons-material/Category';
 import "./sidebar.css";
 
@@ -131,7 +132,7 @@ const SideBar = () => {
 					</li>
 					<li className="sidebar-item d-flex align-items-center">
 						<NavLink
-							to="/orders"
+							to="/dashboard/orders"
 							className={({ isActive }) =>
 								isActive
 									? activeStyle
@@ -145,6 +146,25 @@ const SideBar = () => {
 "
 							>
 								الطلبات
+							</span>
+						</NavLink>
+					</li>
+					<li className="sidebar-item d-flex align-items-center">
+						<NavLink
+							to="/dashboard/shippingCities"
+							className={({ isActive }) =>
+								isActive
+									? activeStyle
+									: "text-decoration-none py-3 px-3  w-100"
+							}
+						>
+							<LocalShippingIcon className="fs-2 mx-3 text-dark" />
+							<span
+								className="fs-4 fw-bold text-body-tertiary
+
+"
+							>
+								مدن الشحن
 							</span>
 						</NavLink>
 					</li>

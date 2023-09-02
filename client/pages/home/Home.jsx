@@ -14,15 +14,42 @@ const Home = () => {
 	const isMobileScreen = useMediaQuery({
 		query: "(max-width: 600px)",
 	});
-    console.log(user);
+	console.log(user);
 	return (
-		<Layout>
+		<Layout
+			robots={true}
+			canonicalUrl={`/`}
+			ogUrl={`/`}
+			ogTitle={
+				"متجر مستلزمات السباكة و الأدوات الصحية و أنظمة المياه - Shatbha Shop | شطبها شوب"
+			}
+			ogDescription={
+				"متجر مستلزمات السباكة و الأدوات الصحية و أنظمة المياه تسوق أون لاين خلاطات المياه و أحواض المطبخ و ديكور المطبخ و الحمام و أطقم المرحاض و حوض الحمام"
+			}
+			title={
+				"متجر مستلزمات السباكة و الأدوات الصحية و أنظمة المياه - Shatbha Shop | شطبها شوب"
+			}
+			description={
+				"متجر مستلزمات السباكة و الأدوات الصحية و أنظمة المياه تسوق أون لاين خلاطات المياه و أحواض المطبخ و ديكور المطبخ و الحمام و أطقم المرحاض و حوض الحمام"
+			}
+			ogImage={"smallbitmap.svg"}
+			msapplicationTileImage={"smallbitmap.svg"}
+			author={"Shatbha Shop | شطبها شوب"}
+			keywords={
+				"متجر مستلزمات السباكة و الأدوات الصحية و أنظمة المياه, خلاطات المياه, أحواض المطبخ, ديكور المطبخ, الحمام, أطقم المرحاض, حوض الحمام"
+			}
+			preloadImages={[
+				"https://ik.imagekit.io/shatbhashop/shatbha-shop-carousel/1.jpg",
+				"https://ik.imagekit.io/shatbhashop/shatbha-shop-carousel/2.jpg",
+				"https://ik.imagekit.io/shatbhashop/shatbha-shop-carousel/3.jpg",
+			]}
+		>
 			<Hero />
 			<main className="container">
-			<Section1 />
-			<LazySection2 />
-			<LazySection3 />
-			<LazySection4 />
+				<Section1 />
+				<LazySection2 />
+				<LazySection3 />
+				<LazySection4 />
 			</main>
 		</Layout>
 	);

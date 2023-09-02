@@ -106,7 +106,7 @@ const Search = () => {
 										className="search-result-item d-flex align-items-center justify-content-between gap-3"
 										key={item._id}
 										onClick={() => {
-											navigate(`/product/${item.slug}`);
+											navigate(`/products/${item.slug}`);
 										}}
 									>
 										<img

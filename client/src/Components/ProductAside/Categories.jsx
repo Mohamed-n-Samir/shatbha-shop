@@ -46,7 +46,7 @@ const Categories = () => {
 				{data?.data?.allSubCategory?.map((category) => (
 					<li key={category._id} className="">
 						<Link
-							to={`/products?cat=${category.category._id}`}
+							to={`/products?cat=${category.category?._id}`}
 							onClick={() => {
 								window.scrollTo(0, 0);
 							}}

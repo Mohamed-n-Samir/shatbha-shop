@@ -81,7 +81,9 @@ const ShoppingCartProvider = ({ children }) => {
 
 	const clearCart = () => {
 		setCartItems([]);
+		localStorage.removeItem("cartItems")
 	};
+
 	const getCartTotal = () => {
 		return cartItems.reduce(
 			(acc, item) => acc + item.newPrice * item.quantity,

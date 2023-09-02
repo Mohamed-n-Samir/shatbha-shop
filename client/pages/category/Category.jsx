@@ -1,7 +1,7 @@
 import NavBar from "../../src/AdminComponents/NavBar/NavBar";
 import SideBar from "../../src/AdminComponents/SideBar/SideBar";
 import ShowCategoryTable from "../../src/AdminComponents/CategoryTable/CategoryTable"
-// import "./users.css";
+import "./category.css";
 
 const Category = () => {
 	return (

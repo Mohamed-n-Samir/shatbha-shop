@@ -141,7 +141,7 @@ const RegFormBody = () => {
 						اختر المدينه (ان لم تجد المدينه الخاصه بك فلا يوجد خدمه
 						شحن لها)
 					</option>
-					{data?.data?.map((city) => {
+					{data?.data?.allCities?.map((city) => {
 						return (
 							city.name !== "Admin" && (
 								<option value={city._id} key={city._id}>

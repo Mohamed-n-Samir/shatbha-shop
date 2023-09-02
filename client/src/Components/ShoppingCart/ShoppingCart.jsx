@@ -97,7 +97,9 @@ const ShoppingCart = ({ isOpen }) => {
 						>
 							حذف الكل
 						</Button>
-						<a href="/checkout" className="d-flex justify-content-center align-items-center">
+						<a href="/checkout" className="d-flex justify-content-center align-items-center" style={{
+							textDecoration: "none"
+						}}>
 							<Button
 								variant="dark py-3 px-5 fs-4 w-75 align-self-center text-decoration-none"
 								style={{

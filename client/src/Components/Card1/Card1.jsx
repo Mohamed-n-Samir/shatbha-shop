@@ -15,7 +15,7 @@ const Card1 = ({...props}) => {
 				<h1>{props.title}</h1>
 				<p>{props.desc}</p>
 				<div className="card-link d-flex justify-content-end">
-					<Link to={0}>تسوق الآن</Link>
+					<Link to={`product-category/${props.catID}`}>تسوق الآن</Link>
 				</div>
 			</div>
 		</div>

@@ -1,0 +1,29 @@
+.image-container:hover {
+    border: 1px solid black;
+    border-radius: 1rem;
+}
+
+.sec1-row {
+
+}
+
+@media screen and (max-width: 991px) {
+    .sec1-row {
+        flex-direction: column !important;
+        gap: 2rem !important;
+    }
+
+    .col-1 {
+        width: 100% !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+
+    .col-1 .img-container{
+        width: 90% !important;
+
+        margin: auto;
+    }
+
+    
+}

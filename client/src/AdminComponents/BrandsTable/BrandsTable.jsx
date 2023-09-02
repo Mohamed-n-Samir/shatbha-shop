@@ -1,4 +1,4 @@
-import { useMemo, useState, useCallback } from "react";
+import { useMemo, useState, useCallback, useEffect } from "react";
 import { MaterialReactTable } from "material-react-table";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import useQueryCustom from "../../hooks/useQueryCustom";
@@ -11,6 +11,7 @@ import { Box, IconButton, MenuItem, Tooltip } from "@mui/material";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import useMutationCustom from "../../hooks/useMutationCustom";
+import { useLocation } from "react-router-dom";
 
 const BrandsTable = () => {
 	const [columnFilters, setColumnFilters] = useState([]);
@@ -18,6 +19,9 @@ const BrandsTable = () => {
 	const [sorting, setSorting] = useState([]);
 	const [createModalOpen, setCreateModalOpen] = useState(false);
 	const [validationErrors, setValidationErrors] = useState({});
+	const location = useLocation();
+	const [tableData, setTableData] = useState([]);
+	const [id, setId] = useState(location.state?.id ?? null);
 	const queryClient = useQueryClient();
 
 	const { data, isError, isFetching, isLoading, refetch } = useQueryCustom(
@@ -49,6 +53,20 @@ const BrandsTable = () => {
 			}
 		},
 	});
+
+	useEffect(() => {
+		if (location.state?.id && data?.data?.allBrand) {
+			console.log(location.state?.id);
+			const filteredData = data?.data?.allBrand?.filter((row) => {
+				return row._id === location?.state?.id;
+			});
+			console.log(filteredData);
+			setTableData(filteredData);
+		} else if (data?.data?.allBrand) {
+			console.log("form else if");
+			setTableData(data?.data?.allBrand);
+		}
+	}, [id, data?.data?.allBrand]);
 
 	const handleSaveCell = (cell, value) => {
 		switch (cell.column.id) {
@@ -155,7 +173,7 @@ const BrandsTable = () => {
 				Cell: ({ cell }) => {
 					return (
 						<Button
-							className="btn btn-dark fs-5 m-auto px-3 py-2"
+							className="btn btn-danger fs-5 m-auto px-3 py-2"
 							onClick={() => {
 								handleDeleteRow(cell.row);
 							}}
@@ -198,7 +216,7 @@ const BrandsTable = () => {
 					},
 				}}
 				columns={columns}
-				data={data?.data?.allBrand ?? []} //data is undefined on first render
+				data={tableData ?? []} //data is undefined on first render
 				initialState={{
 					showColumnFilters: true,
 				}}
@@ -247,9 +265,10 @@ const BrandsTable = () => {
 				enableEditing={true}
 				editingMode="cell"
 				muiTableBodyCellEditTextFieldProps={({ cell }) => ({
-					onBlur: (event) => {
-						console.log(cell, event.target.value)
-						handleSaveCell(cell, event.target.value);
+					onKeyDown: (event) => {
+						if (event.key === "Enter") {
+							handleSaveCell(cell, event.target.value);
+						}
 					},
 				})}
 				enableColumnOrdering

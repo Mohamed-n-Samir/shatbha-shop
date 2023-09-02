@@ -19,30 +19,27 @@ const Navbar2 = () => {
 				</button>
 				<ul className="links links2">
 					<li className="link link2">
-						<Link to="/product-category/خلاطات المياه">
+						<Link to="/product-category/64dbe4bcb035c78e41f0b568">
 							خلاطات المياه
 						</Link>
 					</li>
 					<li className="link link2">
-						<Link to="/product-category/شاور و دش">شاور و دش</Link>
+						<Link to="/product-category/64dbe63d5e826e89dee86b5a">شاور و دش</Link>
 					</li>
 					<li className="link link2">
-						<Link to="/product-category/غطاء بلاعة">غطاء بلاعة</Link>
+						<Link to="/product-category/64dfced3a4724030ed2e80c0">غطاء بلاعة</Link>
 					</li>
 					<li className="link link2">
-						<Link to="/product-category/قواعد و احواض">قواعد و احواض</Link>
+						<Link to="/product-category/64dfcedca4724030ed2e80ca">قواعد و احواض</Link>
 					</li>
 					<li className="link link2">
-						<Link to="/product-category/بانيوهات">بانيوهات</Link>
+						<Link to="/product-category/64dfcee2a4724030ed2e80d4">بانيوهات</Link>
 					</li>
 					<li className="link link2">
-						<Link to="/product-category/حوض المطبخ">حوض المطبخ</Link>
+						<Link to="/product-category/64dbebe4fe92923b352651da">قطع و وصلات</Link>
 					</li>
 					<li className="link link2">
-						<Link to="/product-category/قطع و وصلات">قطع و وصلات</Link>
-					</li>
-					<li className="link link2">
-						<Link to="/product-category/إكسسوارات">إكسسوارات</Link>
+						<Link to="/product-category/64dfcf2aa4724030ed2e80e8">إكسسوارات</Link>
 					</li>
 				</ul>
 				{user !== null && user !== "none" && (

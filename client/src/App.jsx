@@ -23,8 +23,11 @@ const Store = lazy(() => import("../pages/store/Store"));
 const Product = lazy(() => import("../pages/product/Product"));
 const WishList = lazy(() => import("../pages/wishList/WishList"));
 const TermsAndCon = lazy(() => import("../pages/termsAndCon/TermsAndCon"));
-const Search = lazy(() => import("../pages/search/Search"));
+const ProductCategory = lazy(() => import("../pages/productCategory/ProductCategory"));
 const Checkout = lazy(() => import("../pages/checkout/Checkout"));
+const OrderAdmin = lazy(() => import("../pages/orderAdmin/OrderAdmin"));
+const Orders = lazy(() => import("../pages/orders/Orders"));
+const ShippingCities = lazy(() => import("../pages/shippingCities/ShippingCities"));
 const PrivateRoute = lazy(() => import("./utils/PrivateRoute/PrivateRoute"));
 
 function App() {
@@ -34,10 +37,11 @@ function App() {
 				<Route index element={<Home />} />
 				<Route path="register" element={<Register />} exact />
 				<Route path="profile" element={<Profile />} exact />
-				<Route path="search/:searchString" element={<Search />} exact />
+				<Route path="product-category/:categoryID" element={<ProductCategory />} exact />
 				<Route path="login" element={<Login />} exact />
 				<Route path="wishlist" element={<WishList />} exact />
 				<Route path="terms-conditions" element={<TermsAndCon />} exact />
+				<Route path="orders" element={<Orders />} exact />
 				<Route path="products" exact>
 					<Route index element={<Store />} />
 					<Route path=":slug" element={<Product />} exact />
@@ -47,6 +51,8 @@ function App() {
 					<Route path="dashboard" element={<Dashboard />} exact />
 					<Route path="dashboard/users" element={<Users />} exact />
 					<Route path="dashboard/admins" element={<Admins />} exact />
+					<Route path="dashboard/orders" element={<OrderAdmin />} exact />
+					<Route path="dashboard/shippingCities" element={<ShippingCities />} exact />
 					<Route
 						path="dashboard/products"
 						element={<Products />}

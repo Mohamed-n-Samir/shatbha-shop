@@ -1,10 +1,9 @@
 import { useState } from "react";
-import { Form, Button,Row } from "react-bootstrap";
+import { Form, Button, Row } from "react-bootstrap";
 import useMutationCustom from "../../hooks/useMutationCustom";
 import HashLoader from "react-spinners/HashLoader";
 import { toast } from "react-toastify";
 import { useDataProvider } from "../../hooks/useDataProvider";
-
 
 const LoginFormBody = () => {
 	const [form, setForm] = useState({
@@ -12,28 +11,40 @@ const LoginFormBody = () => {
 		password: "",
 	});
 	const [errors, setErrors] = useState({});
-    const { dispatch } = useDataProvider();
+	const { dispatch } = useDataProvider();
 
 	const { mutate, isLoading } = useMutationCustom({
 		onSuccess: (data) => {
 			console.log(data);
 			if (data) {
 				console.log(data);
-                dispatch({
-                    type: "LOGIN",
-                    payload: data.data.user,
-                });
-				toast.success(data.data.message, {
-					position: "top-center",
-					autoClose: 5000,
-					hideProgressBar: false,
-					closeOnClick: true,
-					pauseOnHover: true,
-					draggable: true,
-					progress: undefined,
-					theme: "dark",
-				});
-                
+				if (data.data.message) {
+					dispatch({
+						type: "LOGIN",
+						payload: data.data.user,
+					});
+					toast.success(data.data.message, {
+						position: "top-center",
+						autoClose: 5000,
+						hideProgressBar: false,
+						closeOnClick: true,
+						pauseOnHover: true,
+						draggable: true,
+						progress: undefined,
+						theme: "dark",
+					});
+				} else if (data.data.error) {
+					toast.error(data.data.error, {
+						position: "top-center",
+						autoClose: 5000,
+						hideProgressBar: false,
+						closeOnClick: true,
+						pauseOnHover: true,
+						draggable: true,
+						progress: undefined,
+						theme: "dark",
+					});
+				}
 			}
 		},
 	});
@@ -45,6 +56,46 @@ const LoginFormBody = () => {
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
+		if (!form.email || !form.password) {
+			return toast.error("يجب ادخال البريد الاكتروني وكلمه المرور", {
+				position: "top-center",
+				autoClose: 5000,
+				hideProgressBar: false,
+				closeOnClick: true,
+				pauseOnHover: true,
+				draggable: true,
+				progress: undefined,
+				theme: "dark",
+			});
+		}
+		const re =
+			/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+		if (!re.test(String(form.email).toLowerCase())) {
+			return toast.error("البريد الاكتروني خاطئ", {
+				position: "top-center",
+				autoClose: 5000,
+				hideProgressBar: false,
+				closeOnClick: true,
+				pauseOnHover: true,
+				draggable: true,
+				progress: undefined,
+				theme: "dark",
+			});
+		}
+
+		if (form.password.length < 8) {
+			return toast.error("كلمه المرور خاطئه", {
+				position: "top-center",
+				autoClose: 5000,
+				hideProgressBar: false,
+				closeOnClick: true,
+				pauseOnHover: true,
+				draggable: true,
+				progress: undefined,
+				theme: "dark",
+			});
+		}
+
 		try {
 			mutate(["login", form]);
 		} catch (err) {

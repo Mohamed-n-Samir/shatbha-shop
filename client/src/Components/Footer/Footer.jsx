@@ -9,7 +9,7 @@ import "./footer.css";
 const Footer = () => {
 	return (
 		<footer className="footer-container container px-0">
-			<div className="part1 d-flex justify-content-center align-items-center gap-5 px-3 py-5">
+			{/* <div className="part1 d-flex justify-content-center align-items-center gap-5 px-3 py-5">
 				<div className="map">
 					<iframe
 						width="100%"
@@ -43,11 +43,11 @@ const Footer = () => {
 						style={{ aspectRatio: "1/1" }}
 					/>
 				</div>
-			</div>
+			</div> */}
 
 			<div style={{
 					backgroundColor: "var(--bg-color)",
-				}}  className="part2 d-flex justify-content-center align-items-center gap-4 py-5">
+				}}  className="part2 d-flex justify-content-center align-items-center gap-4 py-5 mt-5">
 				<div className="short-links  w-50">
 					<div className="important4you">
 						<h1 className=" mb-5 w-100">مهم لك:</h1>

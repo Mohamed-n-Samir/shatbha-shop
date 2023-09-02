@@ -1,4 +1,4 @@
-import { useMemo, useState, useCallback } from "react";
+import { useMemo, useState, useCallback, useEffect } from "react";
 import { MaterialReactTable } from "material-react-table";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import useQueryCustom from "../../hooks/useQueryCustom";
@@ -6,25 +6,21 @@ import useMutationCustom from "../../hooks/useMutationCustom";
 import { useQueryClient } from "@tanstack/react-query";
 import "./users-table.css";
 import { useNavigate } from "react-router-dom";
-import {
-	Box,
-	Button,
-	// Dialog,
-	// DialogActions,
-	// DialogContent,
-	// DialogTitle,
-	IconButton,
-	MenuItem,
-	// Stack,
-	// TextField,
-	Tooltip,
-} from "@mui/material";
+import { Button } from "react-bootstrap";
+import { IconButton, MenuItem, Tooltip } from "@mui/material";
 import { toast } from "react-toastify";
+import { useLocation } from "react-router-dom";
+import UpdateUserModal from "../UpdateUserModal/UpdateUserModal";
 
 const UsersTable = () => {
 	const [columnFilters, setColumnFilters] = useState([]);
 	const [globalFilter, setGlobalFilter] = useState("");
 	const [sorting, setSorting] = useState([]);
+	const location = useLocation();
+	const [tableData, setTableData] = useState([]);
+	const [id, setId] = useState(location.state?.id ?? null);
+	const [updateModalOpen, setUpdateModalOpen] = useState(false);
+	const [rowValue, setRowValue] = useState({});
 	const queryClient = useQueryClient();
 	const { data, isError, isFetching, isLoading, refetch } = useQueryCustom(
 		["users-table-data"],
@@ -66,14 +62,21 @@ const UsersTable = () => {
 		},
 	});
 
-	const [tableData, setTableData] = useState(() => data);
-
-	// const handleCreateNewRow = (values) => {
-	// 	tableData.push(values);
-	// 	setTableData([...tableData]);
-	// };
-
 	const navigate = useNavigate();
+
+	useEffect(() => {
+		if (location.state?.id && data?.data?.allUsers) {
+			console.log(location.state?.id);
+			const filteredData = data?.data?.allUsers?.filter((row) => {
+				return row._id === location?.state?.id;
+			});
+			console.log(filteredData);
+			setTableData(filteredData);
+		} else if (data?.data?.allUsers) {
+			console.log("form else if");
+			setTableData(data?.data?.allUsers);
+		}
+	}, [id, data?.data?.allUsers]);
 
 	const handleSaveCell = async (cell, value) => {
 		switch (cell.column.id) {
@@ -348,50 +351,19 @@ const UsersTable = () => {
 			},
 			{
 				accessorFn: (row) => {
-					if (cityData?.data) {
+					if (cityData?.data?.allCities) {
 						return row?.city?.name?.trim();
 					}
 				},
 				id: "city",
 				header: "المدينة",
 				size: 130,
-				enableEditing: true,
-				muiTableBodyCellEditTextFieldProps: {
-					select: true, //change to select for a dropdown
-					children: cityData?.data ? (
-						cityData?.data?.map((city) => {
-							return (
-								city.name !== "Admin" && (
-									<MenuItem
-										key={city?.name}
-										value={city?._id.trim()}
-									>
-										{(city?.name).trim()}
-									</MenuItem>
-								)
-							);
-						})
-					) : (
-						<MenuItem key={0} value={""}>
-							{"No Cities"}
-						</MenuItem>
-					),
-				},
+				enableEditing: false,
 			},
 			{
 				accessorKey: "gender",
 				header: "الجنس",
-				muiTableBodyCellEditTextFieldProps: {
-					select: true, //change to select for a dropdown
-					children: [
-						<MenuItem key={0} value={"Male"}>
-							Male
-						</MenuItem>,
-						<MenuItem key={1} value={"Female"}>
-							Female
-						</MenuItem>,
-					],
-				},
+				enableEditing: false,
 				size: 130,
 			},
 			{
@@ -440,7 +412,9 @@ const UsersTable = () => {
 							variant="contained"
 							className="btn btn-dark fs-5"
 							onClick={() => {
-								navigate(`/wishlist/${cell.getValue()}`);
+								navigate(
+									`/dashboard/wishlist/${cell.getValue()}`
+								);
 							}}
 						>
 							شاهد المفضله
@@ -449,21 +423,50 @@ const UsersTable = () => {
 				},
 			},
 			{
-				accessorKey: "cart",
-				header: "عربه التسوق",
+				accessorKey: "actions",
+				header: "Actions",
 				enableEditing: false,
-				size: 130,
+				size: 150,
 				Cell: ({ cell }) => {
 					return (
-						<Button
-							variant="contained"
-							className="fs-5 w-100"
-							onClick={() => {
-								navigate(`/cart/${cell.getValue()}`);
-							}}
-						>
-							شاهد العربه
-						</Button>
+						<>
+							<Button
+								variant="dark fs-5 ms-2 py-2 px-3"
+								onClick={() => {
+									setUpdateModalOpen(true);
+									setRowValue(cell.row.original);
+								}}
+							>
+								تحديث
+							</Button>
+							{cell.row.original.isBlocked === false ? (
+								<Button
+									variant="danger fs-5 py-2 px-3"
+									onClick={() => {
+										mutate([
+											`block-user/${cell.row.original._id}`,
+											null,
+											"put",
+										]);
+									}}
+								>
+									حظر
+								</Button>
+							) : (
+								<Button
+									variant="primary fs-5 py-2 px-3"
+									onClick={() => {
+										mutate([
+											`unblock-user/${cell.row.original._id}`,
+											null,
+											"put",
+										]);
+									}}
+								>
+									الغاء الحظر
+								</Button>
+							)}
+						</>
 					);
 				},
 			},
@@ -471,17 +474,7 @@ const UsersTable = () => {
 				accessorFn: (row) => (row.isBlocked ? "true" : "false"),
 				id: "isBlocked",
 				header: "محظور",
-				muiTableBodyCellEditTextFieldProps: {
-					select: true, //change to select for a dropdown
-					children: [
-						<MenuItem key={0} value={"true"}>
-							true
-						</MenuItem>,
-						<MenuItem key={1} value={"false"}>
-							false
-						</MenuItem>,
-					],
-				},
+				enableEditing: false,
 				type: "boolean",
 				size: 130,
 			},
@@ -491,25 +484,14 @@ const UsersTable = () => {
 	return (
 		<div className="users-table p-4 fs-3">
 			<MaterialReactTable
-				muiTableBodyRowProps={({ row }) => ({
-					onDragEnd: (event) => {
-						console.info(event, row.getValue("_id"));
-						navigate(`/dashboard/user/${row.getValue("_id")}`, {
-							state: { id: row.getValue("_id") },
-						});
-					},
-					sx: {
-						cursor: "pointer",
-					},
-				})}
-				enableRowDrag
 				enableColumnResizing
 				enableEditing
 				editingMode="cell"
 				muiTableBodyCellEditTextFieldProps={({ cell }) => ({
-					onBlur: (event) => {
-						console.log(event.target);
-						handleSaveCell(cell, event.target.value);
+					onKeyDown: (event) => {
+						if (event.key === "Enter") {
+							handleSaveCell(cell, event.target.value);
+						}
 					},
 				})}
 				displayColumnDefOptions={{
@@ -536,7 +518,7 @@ const UsersTable = () => {
 					},
 				}}
 				columns={columns}
-				data={data?.data?.allUsers ?? []} //data is undefined on first render
+				data={tableData ?? []} //data is undefined on first render
 				initialState={{
 					showColumnFilters: true,
 					columnVisibility: {
@@ -583,6 +565,11 @@ const UsersTable = () => {
 					showLastButton: true,
 				}}
 				enableColumnOrdering
+			/>
+			<UpdateUserModal
+				open={updateModalOpen}
+				onClose={() => setUpdateModalOpen(false)}
+				row={rowValue}
 			/>
 		</div>
 	);

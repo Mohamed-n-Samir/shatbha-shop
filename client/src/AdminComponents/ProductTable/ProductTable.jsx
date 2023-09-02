@@ -7,6 +7,7 @@ import { Block, Edit } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { Button } from "react-bootstrap";
 import CreateNewProductModal from "../CreateNewProductModal/CreateNewProductModal";
+import UpdateProductModal from "../UpdateProductModal/UpdateProductModal";
 import { toast } from "react-toastify";
 import useMutationCustom from "../../hooks/useMutationCustom";
 import { Box, IconButton, MenuItem, Tooltip } from "@mui/material";
@@ -18,7 +19,9 @@ const ProductTable = () => {
 	const [globalFilter, setGlobalFilter] = useState("");
 	const [sorting, setSorting] = useState([]);
 	const [createModalOpen, setCreateModalOpen] = useState(false);
+	const [updateModalOpen, setUpdateModalOpen] = useState(false);
 	const [validationErrors, setValidationErrors] = useState({});
+	const [rowValue, setRowValue] = useState({});
 
 	const queryClient = useQueryClient();
 	const { data, isError, isFetching, isLoading, refetch } = useQueryCustom(
@@ -31,7 +34,6 @@ const ProductTable = () => {
 		}
 	);
 
-	
 	const { mutate, isLoading: mutateLoading } = useMutationCustom({
 		onSuccess: (data) => {
 			console.log(data);
@@ -95,76 +97,7 @@ const ProductTable = () => {
 		switch (cell.column.id) {
 			case "title":
 				if (!value) {
-				return toast.error("العنوان مطلوب", {
-					position: "top-center",
-					autoClose: 5000,
-					hideProgressBar: false,
-					closeOnClick: true,
-					pauseOnHover: true,
-					draggable: true,
-					progress: undefined,
-					theme: "dark",
-				});
-				}
-				break;
-			case "description":
-				if (!value) {
-				return toast.error("الوصف مطلوب", {
-					position: "top-center",
-					autoClose: 5000,
-					hideProgressBar: false,
-					closeOnClick: true,
-					pauseOnHover: true,
-					draggable: true,
-					progress: undefined,
-					theme: "dark",
-				});
-				}
-				break;
-			// case "category":
-			// 	if (!value) {
-			// 	return toast.error("", {
-			// 		position: "top-center",
-			// 		autoClose: 5000,
-			// 		hideProgressBar: false,
-			// 		closeOnClick: true,
-			// 		pauseOnHover: true,
-			// 		draggable: true,
-			// 		progress: undefined,
-			// 		theme: "dark",
-			// 	});
-			// 	}
-
-			// 	break;
-			case "oldPrice":
-				if (!value) {
-				return toast.error("السعر القديم مطلوب", {
-					position: "top-center",
-					autoClose: 5000,
-					hideProgressBar: false,
-					closeOnClick: true,
-					pauseOnHover: true,
-					draggable: true,
-					progress: undefined,
-					theme: "dark",
-				});
-				}
-				break;
-			case "newPrice":
-				if (!value) {
-				return toast.error("السعر الجديد مطلوب", {
-					position: "top-center",
-					autoClose: 5000,
-					hideProgressBar: false,
-					closeOnClick: true,
-					pauseOnHover: true,
-					draggable: true,
-					progress: undefined,
-					theme: "dark",
-				});
-				}
-				else if (value.match(/^[0-9]+$/) == null) {
-					return toast.error("السعر الجديد يجب ان يكون ارقام فقط", {
+					return toast.error("العنوان مطلوب", {
 						position: "top-center",
 						autoClose: 5000,
 						hideProgressBar: false,
@@ -175,9 +108,18 @@ const ProductTable = () => {
 						theme: "dark",
 					});
 				}
-				else if (value <= 0) {
-					return toast.error("السعر الجديد يجب ان يكون اكبر من الصفر", {
-						position: "top-center",	
+				mutate([
+					`updateProduct/${cell.row.original._id}`,
+					{
+						title: value,
+					},
+					"patch",
+				]);
+				break;
+			case "description":
+				if (!value) {
+					return toast.error("الوصف مطلوب", {
+						position: "top-center",
 						autoClose: 5000,
 						hideProgressBar: false,
 						closeOnClick: true,
@@ -186,9 +128,127 @@ const ProductTable = () => {
 						progress: undefined,
 						theme: "dark",
 					});
-
+				} else if (value.length < 10) {
+					return toast.error("الوصف يجب ان يكون اكثر من 10 حروف", {
+						position: "top-center",
+						autoClose: 5000,
+						hideProgressBar: false,
+						closeOnClick: true,
+						pauseOnHover: true,
+						draggable: true,
+						progress: undefined,
+						theme: "dark",
+					});
 				}
-				else {
+				mutate([
+					`updateProduct/${cell.row.original._id}`,
+					{
+						description: value,
+					},
+					"patch",
+				]);
+				break;
+			case "oldPrice":
+				if (!value) {
+					return toast.error("السعر القديم مطلوب", {
+						position: "top-center",
+						autoClose: 5000,
+						hideProgressBar: false,
+						closeOnClick: true,
+						pauseOnHover: true,
+						draggable: true,
+						progress: undefined,
+						theme: "dark",
+					});
+				} else if (value.match(/^[0-9]+$/) == null || value <= 0) {
+					return toast.error(
+						"السعر القديم يجب ان يكون رقم اكبر من الصفر",
+						{
+							position: "top-center",
+							autoClose: 5000,
+							hideProgressBar: false,
+							closeOnClick: true,
+							pauseOnHover: true,
+							draggable: true,
+							progress: undefined,
+							theme: "dark",
+						}
+					);
+				} else if (value < cell.row.original.newPrice) {
+					return toast.error(
+						"السعر القديم يجب ان يكون اكثر من السعر الجديد",
+						{
+							position: "top-center",
+							autoClose: 5000,
+							hideProgressBar: false,
+							closeOnClick: true,
+							pauseOnHover: true,
+							draggable: true,
+							progress: undefined,
+							theme: "dark",
+						}
+					);
+				}
+				mutate([
+					`updateProduct/${cell.row.original._id}`,
+					{
+						oldPrice: value,
+					},
+					"patch",
+				]);
+				break;
+			case "newPrice":
+				if (!value) {
+					return toast.error("السعر الجديد مطلوب", {
+						position: "top-center",
+						autoClose: 5000,
+						hideProgressBar: false,
+						closeOnClick: true,
+						pauseOnHover: true,
+						draggable: true,
+						progress: undefined,
+						theme: "dark",
+					});
+				} else if (value.match(/^[0-9]+$/) == null) {
+					return toast.error("السعر الجديد يجب ان يكون ارقام فقط", {
+						position: "top-center",
+						autoClose: 5000,
+						hideProgressBar: false,
+						closeOnClick: true,
+						pauseOnHover: true,
+						draggable: true,
+						progress: undefined,
+						theme: "dark",
+					});
+				} else if (value <= 0) {
+					return toast.error(
+						"السعر الجديد يجب ان يكون اكبر من الصفر",
+						{
+							position: "top-center",
+							autoClose: 5000,
+							hideProgressBar: false,
+							closeOnClick: true,
+							pauseOnHover: true,
+							draggable: true,
+							progress: undefined,
+							theme: "dark",
+						}
+					);
+				} else if (value > cell.row.original.oldPrice) {
+					return toast.error(
+						"السعر الجديد يجب ان يكون اقل من السعر القديم",
+						{
+							position: "top-center",
+							autoClose: 5000,
+							hideProgressBar: false,
+							closeOnClick: true,
+							pauseOnHover: true,
+							draggable: true,
+							progress: undefined,
+							theme: "dark",
+						}
+					);
+				} else {
 					mutate([
 						`updateProduct/${cell.row.original._id}`,
 						{
@@ -200,17 +260,35 @@ const ProductTable = () => {
 				break;
 			case "quantity":
 				if (!value) {
-				return toast.error("الكميه مطلوبه", {
-					position: "top-center",
-					autoClose: 5000,
-					hideProgressBar: false,
-					closeOnClick: true,
-					pauseOnHover: true,
-					draggable: true,
-					progress: undefined,
-					theme: "dark",
-				});
+					return toast.error("الكميه مطلوبه", {
+						position: "top-center",
+						autoClose: 5000,
+						hideProgressBar: false,
+						closeOnClick: true,
+						pauseOnHover: true,
+						draggable: true,
+						progress: undefined,
+						theme: "dark",
+					});
+				} else if (value.match(/^[0-9]+$/) == null) {
+					return toast.error("الكميه يجب ان تكون ارقام فقط", {
+						position: "top-center",
+						autoClose: 5000,
+						hideProgressBar: false,
+						closeOnClick: true,
+						pauseOnHover: true,
+						draggable: true,
+						progress: undefined,
+						theme: "dark",
+					});
 				}
+				mutate([
+					`updateProduct/${cell.row.original._id}`,
+					{
+						quantity: value,
+					},
+					"patch",
+				]);
 				break;
 			default:
 				toast.error("حدث خطأ ما", {
@@ -225,8 +303,8 @@ const ProductTable = () => {
 				});
 
 				break;
-		}}	
-
+		}
+	};
 
 	const columns = useMemo(() => {
 		return [
@@ -253,10 +331,12 @@ const ProductTable = () => {
 				accessorKey: "category",
 				header: "القسم",
 				size: 130,
+				enableEditing: false,
 				Cell: ({ row }) => {
 					return (
 						<Link
-							to={"/dashboard/category"}
+							to={"/dashboard/categories"}
+							state={{ id: row?.original?.category?._id }}
 							className="d-flex justify-content-center"
 						>
 							{row?.original?.category?.title}
@@ -268,13 +348,23 @@ const ProductTable = () => {
 				accessorKey: "brand",
 				header: "الماركة",
 				size: 130,
+				enableEditing: false,
 				Cell: ({ row }) => {
 					return (
-						<Link className="d-flex justify-content-center">
+						<Link
+							to={"/dashboard/brands"}
+							state={{ id: row?.original?.brand?._id }}
+							className="d-flex justify-content-center"
+						>
 							{row?.original?.brand?.name}
 						</Link>
 					);
 				},
+			},
+			{
+				accessorKey: "quantity",
+				header: "الكميه",
+				size: 140,
 			},
 			{
 				accessorKey: "oldPrice",
@@ -282,13 +372,7 @@ const ProductTable = () => {
 				size: 140,
 			},
 			{
-				accessorFn: (row) => {
-					console.log(row);
-					return row?.newPrice === null
-						? row?.oldPrice
-						: row?.newPrice;
-				},
-				id: "newPrice",
+				accessorKey: "newPrice",
 				header: "السعر الجديد",
 				size: 140,
 			},
@@ -310,11 +394,13 @@ const ProductTable = () => {
 					);
 				},
 				size: 250,
+				enableEditing: false,
 			},
 			{
 				accessorKey: "tags",
 				header: "التاجات",
 				size: 130,
+				enableEditing: false,
 				Cell: ({ row }) => {
 					return (
 						<div className="d-flex flex-column gap-2">
@@ -365,19 +451,31 @@ const ProductTable = () => {
 				enableEditing: false,
 			},
 			{
-				accessorKey: "delete",
-				header: "Action",
+				accessorKey: "actions",
+				header: "Actions",
 				size: 130,
+				enableEditing: false,
 				Cell: ({ cell }) => {
 					return (
-						<Button
-							className="btn btn-dark fs-5 m-auto px-3 py-2"
-							onClick={() => {
-								handleDeleteRow(cell.row);
-							}}
-						>
-							حذف
-						</Button>
+						<>
+							<Button
+								variant="btn btn-danger fs-5 ms-2 px-3 py-2"
+								onClick={() => {
+									handleDeleteRow(cell.row);
+								}}
+							>
+								حذف
+							</Button>
+							<Button
+								variant="btn btn-dark fs-5 m-auto px-3 py-2"
+								onClick={() => {
+									setUpdateModalOpen(true);
+									setRowValue(cell.row.original);
+								}}
+							>
+								تحديث
+							</Button>
+						</>
 					);
 				},
 			},
@@ -434,9 +532,11 @@ const ProductTable = () => {
 				enableEditing
 				editingMode="cell"
 				muiTableBodyCellEditTextFieldProps={({ cell }) => ({
-					onBlur: (event) => {
-						console.log(event.target);
-						handleSaveCell(cell, event.target.value);
+						onKeyDown : (event) => {
+							if (event.key === "Enter") {
+								console.log(event.target.value)
+								handleSaveCell(cell, event.target.value);
+							}
 					},
 				})}
 				onColumnFiltersChange={setColumnFilters}
@@ -481,10 +581,15 @@ const ProductTable = () => {
 				open={createModalOpen}
 				onClose={() => setCreateModalOpen(false)}
 			/>
+			<UpdateProductModal
+				open={updateModalOpen}
+				onClose={() => setUpdateModalOpen(false)}
+				row={rowValue}
+			/>
 		</div>
 	);
 };
 
-const ShowAdminTable = () => <ProductTable />;
+const ShowProductTable = () => <ProductTable />;
 
-export default ShowAdminTable;
+export default ShowProductTable;

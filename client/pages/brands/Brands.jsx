@@ -1,7 +1,7 @@
 import NavBar from "../../src/AdminComponents/NavBar/NavBar";
 import SideBar from "../../src/AdminComponents/SideBar/SideBar";
 import ShowBrandsTable from "../../src/AdminComponents/BrandsTable/BrandsTable"
-// import "./users.css";
+import "./brands.css";
 
 const Brands = () => {
 	return (

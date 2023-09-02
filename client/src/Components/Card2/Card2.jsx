@@ -123,7 +123,7 @@ const Card2 = ({
 
 				<Button
 					variant="outline-dark"
-					className="py-4 px-5 fs-4 fw-bold"
+					className="p-4 fs-4 fw-bold"
 				>
 					إضافة الى المفضلة <FavoriteBorder fontSize="large" />
 				</Button>

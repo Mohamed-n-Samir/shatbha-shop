@@ -15,7 +15,25 @@ const Store = () => {
 
 
 	return (
-		<Layout>
+		<Layout
+			robots={true}
+			canonicalUrl={`/products`}
+			ogUrl={`/products`}
+			ogTitle={"متجر شطبها شوب | Shatbha Shop"}
+			ogDescription={
+				"متجر مستلزمات السباكة و الأدوات الصحية و أنظمة المياه تسوق أون لاين خلاطات المياه و أحواض المطبخ و ديكور المطبخ و الحمام و أطقم المرحاض و حوض الحمام"
+			}
+			title={"متجر شطبها شوب | Shatbha Shop"}
+			description={
+				"متجر مستلزمات السباكة و الأدوات الصحية و أنظمة المياه تسوق أون لاين خلاطات المياه و أحواض المطبخ و ديكور المطبخ و الحمام و أطقم المرحاض و حوض الحمام"
+			}
+			ogImage={"smallbitmap.svg"}
+			msapplicationTileImage={"smallbitmap.svg"}
+			author={"Shatbha Shop | شطبها شوب"}
+			keywords={
+				"متجر مستلزمات السباكة و الأدوات الصحية و أنظمة المياه, خلاطات المياه, أحواض المطبخ, ديكور المطبخ, الحمام, أطقم المرحاض, حوض الحمام"
+			}
+		>
 			<main className={`d-flex store pt-3`}>
 				<ProductAside value={value} setValue={setValue} MIN={MIN} MAX={MAX} setcomValue={setcomValue} setSort={setSort} itemsNubmer={itemsNubmer}/>
 				<StoreSection gte={comValue[0]} lte={comValue[1]} sort={sort} setItemsNubmer={setItemsNubmer}/>
