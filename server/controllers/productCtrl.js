@@ -119,12 +119,13 @@ const deleteProduct = async (req, res) => {
 const getaProduct = async (req, res) => {
 	const { slug } = req.params;
 
-	console.log(slug)
+	console.log(slug);
 
-	if(!slug) 
-		return res.status(422).json({ error: "المنتج غير موجود" });
+	if (!slug) return res.status(422).json({ error: "المنتج غير موجود" });
 	try {
-		const findProduct = await Product.findOne({slug: slug}).populate("category").populate("brand");
+		const findProduct = await Product.findOne({ slug: slug })
+			.populate("category")
+			.populate("brand");
 		res.status(200).json(findProduct);
 	} catch (error) {
 		res.status(500).json({ error: error.message });
@@ -133,7 +134,7 @@ const getaProduct = async (req, res) => {
 
 const getAllProduct = asyncHandler(async (req, res) => {
 	try {
-		const allProduct = await Product.find({})
+		const allProduct = await Product.find({ minQuantity: { $eq: 1 } })
 			.populate("category")
 			.populate("brand")
 			.sort({ createdAt: -1 });
@@ -142,6 +143,123 @@ const getAllProduct = asyncHandler(async (req, res) => {
 		throw new Error(error);
 	}
 });
+
+const getAllGomla = async (req, res) => {
+	try {
+		// Filtering
+		const queryObj = { ...req.query };
+		const excludeFields = ["page", "sort", "limit", "fields", "tags"];
+		let queryStr;
+		let query;
+		let subCategory;
+		if (queryObj) {
+			excludeFields.forEach((el) => delete queryObj[el]);
+			queryStr = JSON.stringify(queryObj);
+			queryStr = queryStr.replace(
+				/\b(gte|gt|lte|lt)\b/g,
+				(match) => `$${match}`
+			);
+
+			console.log(queryStr);
+			console.log(JSON.parse(queryStr));
+
+			query = {
+				...JSON.parse(queryStr),
+				minQuantity: {
+					$gt: 1,
+				},
+			};
+
+			if (req.query.title) {
+				query = {
+					...query,
+					title: new RegExp(req.query.title, "i"),
+				};
+				console.log(query);
+			}
+
+			if (req.query.tags) {
+				console.log(req.query.tags);
+				if (mongoose.Types.ObjectId.isValid(req.query.tags)) {
+					console.log("halawaaaaaaaaaaaaaaaa111" + req.query.tags);
+					query = Product.find({
+						...query,
+						$or: [
+							{
+								tags: {
+									$elemMatch: {
+										$in: await SubCategory.find({
+											category: req.query.tags,
+										}).distinct("subCategory"),
+									},
+								},
+							},
+							{
+								category: req.query.tags,
+							},
+						],
+					}).populate("category");
+					subCategory = await SubCategory.findOne({
+						category: req.query.tags,
+					}).populate("category");
+				} else {
+					query = Product.find({
+						...query,
+						tags: req.query.tags,
+					}).populate("category");
+				}
+			} else {
+				query = Product.find(query).populate("category");
+			}
+		}
+
+		// Sorting
+
+		if (req.query.sort) {
+			const sortBy = req.query.sort.split(",").join(" ");
+			query = query.sort(sortBy);
+		} else {
+			query = query.sort("-createdAt");
+		}
+
+		// limiting the fields
+
+		if (req.query.fields) {
+			const fields = req.query.fields.split(",").join(" ");
+			query = query.select(fields);
+		} else {
+			query = query.select("-__v");
+		}
+
+		const productCount = await Product.find(query).countDocuments();
+
+		// pagination
+
+		// let productCount = 12
+
+		const page = req.query.page || 1;
+		const limit = req.query.limit || 5;
+		const skip = (page - 1) * limit;
+		query = query.skip(skip).limit(limit);
+
+		if (skip >= productCount && page > 1)
+			return res.status(404).json({ message: "هذه الصفحه غير موجوده" });
+
+		const products = await query;
+
+		res.status(200).json({
+			products: {
+				productCount,
+				products,
+				category:
+					subCategory !== {} ? subCategory?.category?.title : null,
+			},
+		});
+	} catch (error) {
+		console.log(error);
+		return res.status(500).json({ error: error.message });
+	}
+};
 
 const getAllProduct1 = async (req, res) => {
 	try {
@@ -162,20 +280,35 @@ const getAllProduct1 = async (req, res) => {
 			console.log(queryStr);
 			console.log(JSON.parse(queryStr));
 
+			query = {
+				...JSON.parse(queryStr),
+				$or: [
+					{
+						minQuantity: 1,
+					},
+					{
+						minQuantity: {
+							$exists: false,
+						},
+					},
+					{
+						minQuantity: null,
+					},
+				],
+			};
+
 			if (req.query.title) {
 				query = {
-					...JSON.parse(queryStr),
+					...query,
 					title: new RegExp(req.query.title, "i"),
 				};
 				console.log(query);
-			} else {
-				query = JSON.parse(queryStr);
 			}
 
 			if (req.query.tags) {
 				console.log(req.query.tags);
 				if (mongoose.Types.ObjectId.isValid(req.query.tags)) {
-					console.log("halawaaaaaaaaaaaaaaaa111");
+					console.log("halawaaaaaaaaaaaaaaaa111" + req.query.tags);
 					query = Product.find({
 						...query,
 						$or: [
@@ -389,5 +522,6 @@ module.exports = {
 	getOffers,
 	getAllProduct1,
 	test,
-	getaProduct
+	getaProduct,
+	getAllGomla,
 };

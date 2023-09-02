@@ -3,6 +3,7 @@ const Product = require("../model/productModel");
 const Cart = require("../model/cartModel");
 const Coupon = require("../model/couponModel");
 const Order = require("../model/orderModel");
+const City = require("../model/shipingCity");
 const uniqid = require("uniqid");
 
 const asyncHandler = require("express-async-handler");
@@ -16,6 +17,7 @@ const {
 } = require("../helpers/validation");
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 // Create a User ----------------------------------------------
 
 const createUser = asyncHandler(async (req, res) => {
@@ -164,83 +166,58 @@ const createAdmin = async (req, res) => {
 };
 
 // Login a user
-const login = asyncHandler(async (req, res) => {
+const login = async (req, res) => {
 	const { email, password } = req.body;
 	// check if cridentials exists or not
-	if (!email || !password) {
-		return res
-			.status(401)
-			.json({ error: "البريد الاكتروني وكلمة المرور مطلوبين" });
-	}
-	// check if user exists or not
-	const findUser = await User.findOne({ email });
-	if (findUser) {
-		if (!(await findUser.isPasswordMatched(password))) {
-			return res.status(401).json({ error: "كلمة المرور غير صحيحة" });
+	try {
+		if (!email || !password) {
+			return res
+				.status(401)
+				.json({ error: "البريد الاكتروني وكلمة المرور مطلوبين" });
 		}
-		const refreshToken = await generateRefreshToken(findUser?._id);
-		const updateuser = await User.findByIdAndUpdate(
-			findUser.id,
-			{
-				refreshToken: refreshToken,
-			},
-			{ new: true }
-		);
-		res.cookie("refToken", refreshToken, {
-			httpOnly: true,
-		});
-		res.cookie("jwt", generateToken({ _id: findUser?._id }, "30min"), {
-			httpOnly: true,
-		});
+		// check if user exists or not
+		const findUser = await User.findOne({ email });
+		if (findUser) {
+			if (findUser.isBlocked)
+				return res.status(401).json({ error: "تم حظر هذا المستخدم" });
+			if (!(await findUser.isPasswordMatched(password))) {
+				return res.status(401).json({ error: "كلمة المرور غير صحيحة" });
+			}
+			const refreshToken = await generateRefreshToken(findUser?._id);
+			const updateuser = await User.findByIdAndUpdate(
+				findUser.id,
+				{
+					refreshToken: refreshToken,
+				},
+				{ new: true }
+			);
+			res.cookie("refToken", refreshToken, {
+				httpOnly: true,
+				maxAge: 192 * 60 * 60 * 1000,
+			});
+			res.cookie("jwt", generateToken({ _id: findUser?._id }, "60min"), {
+				httpOnly: true,
+				maxAge: 60 * 60 * 1000,
+			});
 
-		return res.status(200).json({
-			message: "تم تسجيل الدخول بنجاح",
-			user: {
-				_id: findUser._id,
-				firstname: findUser.firstname,
-				lastname: findUser.lastname,
-				email: findUser.email,
-				mobile: findUser.mobile,
-				role: findUser?.role,
-			},
-		});
-	} else {
-		return res.status(401).json({ error: "البريد الاكتروني غير صحيح" });
+			return res.status(200).json({
+				message: "تم تسجيل الدخول بنجاح",
+				user: {
+					_id: findUser._id,
+					firstname: findUser.firstname,
+					lastname: findUser.lastname,
+					email: findUser.email,
+					mobile: findUser.mobile,
+					role: findUser?.role,
+				},
+			});
+		} else {
+			return res.status(401).json({ error: "البريد الاكتروني غير صحيح" });
+		}
+	} catch (error) {
+		res.status(500).json({ error: error.message });
 	}
-});
-
-// admin login
-
-const loginAdmin = asyncHandler(async (req, res) => {
-	const { email, password } = req.body;
-	// check if user exists or not
-	const findAdmin = await User.findOne({ email });
-	if (findAdmin.role !== "admin") throw new Error("Not Authorised");
-	if (findAdmin && (await findAdmin.isPasswordMatched(password))) {
-		const refreshToken = await generateRefreshToken(findAdmin?._id);
-		const updateuser = await User.findByIdAndUpdate(
-			findAdmin.id,
-			{
-				refreshToken: refreshToken,
-			},
-			{ new: true }
-		);
-		res.cookie("refToken", refreshToken, {
-			httpOnly: true,
-			maxAge: 72 * 60 * 60 * 1000,
-		});
-		res.json({
-			_id: findAdmin?._id,
-			firstname: findAdmin?.firstname,
-			lastname: findAdmin?.lastname,
-			email: findAdmin?.email,
-			mobile: findAdmin?.mobile,
-			token: generateToken(findAdmin?._id),
-		});
-	} else {
-		throw new Error("Invalid Credentials");
-	}
-});
+};
 
 // handle refresh token
 
@@ -338,7 +315,7 @@ const logout = asyncHandler(async (req, res) => {
 	}
 });
 
-// Update a user
+// Update a user for admin
 
 const updateUser = async (req, res) => {
 	const _id = req.params.id;
@@ -353,6 +330,127 @@ const updateUser = async (req, res) => {
 		});
 		console.log(updatedUser);
 		res.status(200).json({ message: "تم تحديث البيانات بنجاح" });
+	} catch (error) {
+		console.log(error.message);
+		res.status(500).json({ error: error.message });
+	}
+};
+// Update a for user
+
+const updateUser2 = async (req, res) => {
+	const { id } = res.locals;
+	const { firstname, lastname, mobile, city, area, buildingAndApartment } =
+		req.body;
+	validateMongoDbId(id);
+
+	try {
+		if (firstname) {
+			if (!validateStringlength(firstname, 3, 20))
+				return res.status(422).json({
+					error: "الاسم الاول يجب ان يكون بين 3 و 20 حرف",
+				});
+			if (firstname.split(" ").length > 1)
+				return res.status(422).json({
+					error: "يجب ادخال الاسم الاول فقط",
+				});
+			const updatedUser = await User.findByIdAndUpdate(
+				id,
+				{ firstname: firstname },
+				{
+					new: true,
+					runValidators: true,
+				}
+			);
+			return res.status(200).json({ message: "تم تحديث البيانات بنجاح" });
+		}
+		if (lastname) {
+			if (!validateStringlength(lastname, 3, 20))
+				return res.status(422).json({
+					error: "الاسم الاخير يجب ان يكون بين 3 و 20 حرف",
+				});
+			if (firstname.split(" ").length > 1)
+				return res.status(422).json({
+					error: "يجب ادخال الاسم الاخير فقط",
+				});
+			const updatedUser = await User.findByIdAndUpdate(
+				id,
+				{ lastname: lastname },
+				{
+					new: true,
+					runValidators: true,
+				}
+			);
+			return res.status(200).json({ message: "تم تحديث البيانات بنجاح" });
+		}
+		if (mobile) {
+			if (!validateMobile(mobile))
+				return res.status(422).json({
+					error: "رقم الهاتف يجب ان يكون بين 3 و 20 حرف",
+				});
+			const mobileFound = await User.findOne({ mobile: mobile });
+			if (mobileFound)
+				return res.status(409).json({
+					error: "رقم الهاتف موجود بالفعل",
+				});
+			const updatedUser = await User.findByIdAndUpdate(
+				id,
+				{ mobile: mobile },
+				{
+					new: true,
+					runValidators: true,
+				}
+			);
+			return res.status(200).json({ message: "تم تحديث البيانات بنجاح" });
+		}
+		if (city) {
+			if (validateMongoDbId(city)) {
+				res.status(422).json({ error: "الرجاء اختيار المدينة" });
+			}
+			const updatedUser = await User.findByIdAndUpdate(
+				id,
+				{ city: city },
+				{
+					new: true,
+					runValidators: true,
+				}
+			);
+			return res.status(200).json({ message: "تم تحديث البيانات بنجاح" });
+		}
+
+		if (area) {
+			if (!validateStringlength(area, 3, 20))
+				return res.status(422).json({
+					error: "المنطقة يجب ان يكون بين 3 و 20 حرف",
+				});
+			const updatedUser = await User.findByIdAndUpdate(
+				id,
+				{ area: area },
+				{
+					new: true,
+					runValidators: true,
+				}
+			);
+			return res.status(200).json({ message: "تم تحديث البيانات بنجاح" });
+		}
+		if (buildingAndApartment) {
+			if (!validateStringlength(buildingAndApartment, 3, 20))
+				return res.status(422).json({
+					error: "المنطقة يجب ان يكون بين 3 و 20 حرف",
+				});
+			const updatedUser = await User.findByIdAndUpdate(
+				id,
+				{ buildingAndApartment: buildingAndApartment },
+				{
+					new: true,
+					runValidators: true,
+				}
+			);
+			return res.status(200).json({ message: "تم تحديث البيانات بنجاح" });
+		}
+
+		return res
+			.status(422)
+			.json({ error: "الرجاء ادخال البيانات المطلوبة" });
 	} catch (error) {
 		console.log(error.message);
 		res.status(500).json({ error: error.message });
@@ -425,16 +523,13 @@ const getaUser = asyncHandler(async (req, res) => {
 	}
 });
 
-const getUserData = asyncHandler(async (req, res) => {
-	console.log("halawa3");
+const getUserData = async (req, res) => {
 	const { id } = res.locals;
-	// validateMongoDbId(id);
 
 	try {
-		console.log("halawa4");
 		console.log(id);
 		const getaUser = await User.findById(id).populate("city");
-		res.json({
+		res.status(200).json({
 			user: {
 				_id: getaUser?._id,
 				firstname: getaUser?.firstname,
@@ -449,27 +544,11 @@ const getUserData = asyncHandler(async (req, res) => {
 			},
 		});
 	} catch (error) {
-		throw new Error(error);
+		res.status(500).json({ error: error.message });
 	}
-});
+};
 
-// Get a single user
-
-const deleteaUser = asyncHandler(async (req, res) => {
-	const { id } = req.params;
-	validateMongoDbId(id);
-
-	try {
-		const deleteaUser = await User.findByIdAndDelete(id);
-		res.json({
-			deleteaUser,
-		});
-	} catch (error) {
-		throw new Error(error);
-	}
-});
-
-const blockUser = asyncHandler(async (req, res) => {
+const blockUser = async (req, res) => {
 	const { id } = req.params;
 	validateMongoDbId(id);
 
@@ -483,13 +562,13 @@ const blockUser = asyncHandler(async (req, res) => {
 				new: true,
 			}
 		);
-		res.json(blockusr);
+		res.status(200).json({ message: "تم حظر المستخدم بنجاح" });
 	} catch (error) {
-		throw new Error(error);
+		res.status(500).json({ error: error.message });
 	}
-});
+};
 
-const unblockUser = asyncHandler(async (req, res) => {
+const unblockUser = async (req, res) => {
 	const { id } = req.params;
 	validateMongoDbId(id);
 
@@ -503,27 +582,45 @@ const unblockUser = asyncHandler(async (req, res) => {
 				new: true,
 			}
 		);
-		res.json({
-			message: "User UnBlocked",
+		res.status(200).json({ message: "تم الغاء حظر المستخدم بنجاح" });
+	} catch (error) {
+		res.status(500).json({ error: error.message });
+	}
+};
+
+const updatePassword = async (req, res) => {
+	console.log("halalalalalalal");
+	const { id } = res.locals;
+	const { oldPassword, newPassword } = req.body;
+	console.log(req.body);
+	try {
+		validateMongoDbId(id);
+		if (!oldPassword || oldPassword?.length === 0)
+			return res.status(401).json({
+				error: "كلمة المرور القديمة مطلوبة",
+			});
+		const user = await User.findById(id);
+		if (!(await user.isPasswordMatched(oldPassword)))
+			return res.status(401).json({
+				error: "كلمة المرور القديمة غير صحيحة",
+			});
+		if (oldPassword === newPassword)
+			return res.status(401).json({
+				error: "كلمة المرور الجديدة يجب ان تكون مختلفة عن كلمة المرور القديمة",
+			});
+		if (newPassword.length < 8)
+			return res.status(401).json({
+				error: "كلمة المرور يجب ان تكون اكثر من 8 احرف",
+			});
+		user.password = newPassword;
+		await user.save();
+		res.status(200).json({
+			message: "تم تغيير كلمة المرور بنجاح",
 		});
 	} catch (error) {
-		throw new Error(error);
+		res.status(500).json({ error: error.message });
 	}
-});
-
-const updatePassword = asyncHandler(async (req, res) => {
-	const { _id } = req.user;
-	const { password } = req.body;
-	validateMongoDbId(_id);
-	const user = await User.findById(_id);
-	if (password) {
-		user.password = password;
-		const updatedPassword = await user.save();
-		res.json(updatedPassword);
-	} else {
-		res.json(user);
-	}
-});
+};
 
 const resetPassword = asyncHandler(async (req, res) => {
 	const { password } = req.body;
@@ -660,86 +757,185 @@ const applyCoupon = asyncHandler(async (req, res) => {
 });
 
 const createOrder = async (req, res) => {
-	const { products } = await req.body;
+	const { products, city, area, buildingAndApartment, notes } =
+		await req.body;
 	const { id } = res.locals;
 	validateMongoDbId(id);
 	let cartTotal = 0;
-	if (products.length > 0) {
-		console.log(products.length);
+	let address;
+	let shippingPrice = 0;
+	if (!products || products.length === 0) {
+		res.status(400).json({ error: "لا يوجد منتجات في السله" });
+	}
+	if (!city || city?.length === 0 || !area || area?.length === 0) {
+		const { city, area, buildingAndApartment } = await User.findById(id)
+			.populate("city")
+			.select("city area buildingAndApartment");
+		address = `${city?.name}/${area}/${buildingAndApartment}`;
+		shippingPrice = city?.shippingCharge;
+		console.log(address);
+	} else {
+		const city = await City.find({ _id: city }).select("name");
+		address = `${city?.name}/${area}/${buildingAndApartment}`;
+		console.log(address);
+	}
+
+	try {
 		for (let i = 0; i < products.length; i++) {
 			const price = await Product.findOne({
-				_id: products[i]._id,
+				product: products[i]._id,
 			}).select("newPrice");
-			console.log(price.newPrice)
-			cartTotal = cartTotal + price.newPrice * products[i].quantity;
+			console.log(price.newPrice);
+			cartTotal =
+				cartTotal +
+				shippingPrice +
+				price.newPrice * products[i].quantity;
 		}
+		let newOrder = await new Order({
+			products: products,
+			paymentIntent: {
+				id: uniqid(),
+				method: "COD",
+				amount: cartTotal,
+				created: Date.now(),
+				currency: "EGP",
+			},
+			orderby: id,
+			orderStatus: "Not Processed",
+			destinationAddress: address,
+			notes,
+		}).save();
+		res.status(200).json({
+			message: "تم تنفيذ الطلب بنجاح",
+		});
+	} catch (error) {
+		res.status(500).json({ error: error.message });
 	}
-
-	res.status(200).json({
-		cartTotal,
-	});
-
-	// try {
-	// 	if (!COD) throw new Error("Create cash order failed");
-	// 	const user = await User.findById(_id);
-	// 	let userCart = await Cart.findOne({ orderby: user._id });
-	// 	let finalAmout = 0;
-
-	// 	let newOrder = await new Order({
-	// 		products: userCart.products,
-	// 		paymentIntent: {
-	// 			id: uniqid(),
-	// 			method: "COD",
-	// 			amount: finalAmout,
-	// 			status: "Cash on Delivery",
-	// 			created: Date.now(),
-	// 			currency: "EGP",
-	// 		},
-	// 		orderby: user._id,
-	// 		orderStatus: "Cash on Delivery",
-	// 	}).save();
-	// 	let update = userCart.products.map((item) => {
-	// 		return {
-	// 			updateOne: {
-	// 				filter: { _id: item.product._id },
-	// 				update: {
-	// 					$inc: { quantity: -item.count, sold: +item.count },
-	// 				},
-	// 			},
-	// 		};
-	// 	});
-	// 	const updated = await Product.bulkWrite(update, {});
-	// 	res.json({ message: "success" });
-	// } catch (error) {
-	// 	throw new Error(error);
-	// }
 };
 
-const getOrders = asyncHandler(async (req, res) => {
-	const { _id } = req.user;
-	validateMongoDbId(_id);
+// const createOrderVisa = async (req, res) => {
+// 	const { products, city, area, buildingAndApartment, notes } =
+// 		await req.body;
+// 	const { id } = res.locals;
+// 	validateMongoDbId(id);
+// 	let cartTotal = 0;
+// 	let address;
+// 	if (!products || products.length === 0) {
+// 		res.status(400).json({ error: "لا يوجد منتجات في السله" });
+// 	}
+// 	if (!city || city?.length === 0 || !area || area?.length === 0) {
+// 		const { city, area, buildingAndApartment } = await User.findById(id)
+// 			.populate("city")
+// 			.select("city area buildingAndApartment");
+// 		address = `${city?.name}/${area}/${buildingAndApartment}`;
+// 		console.log(address);
+// 	} else {
+// 		const city = await City.find({ _id: city }).select("name");
+// 		address = `${city?.name}/${area}/${buildingAndApartment}`;
+// 		console.log(address);
+// 	}
+
+// 	try {
+// 		if (!products || products.length === 0) {
+// 			return res.status(400).json({ error: "لا يوجد منتجات في السله" });
+// 		}
+// 		let stripeProductData = [];
+
+// 		products?.map(async (product,i) => {
+// 			const prod = await Product.findOne({
+// 				_id: product._id,
+// 			}).select("newPrice title");
+// 			console.log(prod.newPrice, prod.title);
+// 			cartTotal = cartTotal + prod.newPrice * product.quantity;
+// 			stripeProductData.push({
+// 				price_data: {
+// 					currency: "EGP",
+// 					product_data: {
+// 						name: product.title,
+// 					},
+// 					unit_amount: product.newPrice * 100,
+// 				},
+// 				quantity: product.quantity,
+// 			});
+// 		});
+
+// 		const session = await stripe.checkout.sessions.create({
+// 			payment_method_types: ["card"],
+// 			mode: "payment",
+// 			line_items: stripeProductData,
+// 			success_url: `${process.env.CLIENT_URL}/success`,
+// 			cancel_url: `${process.env.CLIENT_URL}/cancel`,
+// 		});
+// 		let newOrder = await new Order({
+// 			products: products,
+// 			paymentIntent: {
+// 				id: uniqid(),
+// 				method: "COD",
+// 				amount: cartTotal,
+// 				status: "Cash on Delivery",
+// 				created: Date.now(),
+// 				currency: "EGP",
+// 			},
+// 			orderby: id,
+// 			orderStatus: "Cash on Delivery",
+// 			destinationAddress: address,
+// 			notes,
+// 		}).save();
+// 		res.status(200).json({
+// 			message: "تم تنفيذ الطلب بنجاح",
+// 		});
+// 	} catch (error) {
+// 		res.status(500).json({ error: error.message });
+// 	}
+// };
+
+const getOrders = async (req, res) => {
+	const { id } = res.locals;
+	validateMongoDbId(id);
+	console.log(id);
 	try {
-		const userorders = await Order.findOne({ orderby: _id })
+		const userOrders = await Order.find({ orderby: id })
 			.populate("products.product")
 			.populate("orderby")
+			.sort({ createdAt: -1 })
 			.exec();
-		res.json(userorders);
+		res.status(200).json({ userOrders });
 	} catch (error) {
-		throw new Error(error);
+		res.status(500).json({ error: error.message });
 	}
-});
+};
 
-const getAllOrders = asyncHandler(async (req, res) => {
+const getAllOrders = async (req, res) => {
 	try {
 		const alluserorders = await Order.find()
 			.populate("products.product")
 			.populate("orderby")
-			.exec();
-		res.json(alluserorders);
+			.sort({ createdAt: -1 });
+
+		console.log(alluserorders);
+		res.status(200).json({ alluserorders });
 	} catch (error) {
-		throw new Error(error);
+		res.status(500).json({ error: error.message });
 	}
-});
+};
+
+const updateOrder = async (req, res) => {
+	const { id } = req.params;
+	const data = req.body;
+	validateMongoDbId(id);
+	try {
+		if (!data || data === {}) {
+			return res.status(422).json({ error: "الرجاء ادخال البيانات" });
+		}
+		const updateOrder = await Order.findByIdAndUpdate(id, data, {
+			new: true,
+		});
+		return res.status(200).json({ message: "تم تحديث البيانات بنجاح" });
+	} catch (error) {
+		return res.status(500).json({ error: error.message });
+	}
+};
+
 const getOrderByUserId = asyncHandler(async (req, res) => {
 	const { id } = req.params;
 	validateMongoDbId(id);
@@ -753,7 +949,7 @@ const getOrderByUserId = asyncHandler(async (req, res) => {
 		throw new Error(error);
 	}
 });
-const updateOrderStatus = asyncHandler(async (req, res) => {
+const updateOrderStatus = async (req, res) => {
 	const { status } = req.body;
 	const { id } = req.params;
 	validateMongoDbId(id);
@@ -768,11 +964,11 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
 			},
 			{ new: true }
 		);
-		res.json(updateOrderStatus);
+		res.status(200).json({ updateOrderStatus });
 	} catch (error) {
-		throw new Error(error);
+		res.status(500).json({ error: error.message });
 	}
-});
+};
 
 module.exports = {
 	createUser,
@@ -780,7 +976,7 @@ module.exports = {
 	getallUser,
 	getallAdmins,
 	getaUser,
-	deleteaUser,
+	updateUser2,
 	updateUser,
 	blockUser,
 	unblockUser,
@@ -788,7 +984,7 @@ module.exports = {
 	logout,
 	updatePassword,
 	resetPassword,
-	loginAdmin,
+	updateOrder,
 	getWishlist,
 	addToWishlist,
 	saveAddress,
@@ -797,6 +993,7 @@ module.exports = {
 	emptyCart,
 	applyCoupon,
 	createOrder,
+	// createOrderVisa,
 	getOrders,
 	updateOrderStatus,
 	getAllOrders,

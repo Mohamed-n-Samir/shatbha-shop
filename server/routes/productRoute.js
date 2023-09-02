@@ -8,6 +8,7 @@ const {
 	getOffers,
 	rating,
 	getAllProduct1,
+	getAllGomla,
 	test,
 	getaProduct
 } = require("./../controllers/productCtrl");
@@ -22,6 +23,7 @@ router.route("/api/getaProduct/:slug").get(getaProduct);
 router.route("/api/updateProduct/:id").patch(isAdmin, updateProduct);
 router.route("/api/allProduct").get(isAdmin,getAllProduct);
 router.route("/api/allProductForUsers").get(getAllProduct1);
+router.route("/api/getAllGomla").get(getAllGomla);
 router.route("/wishlist").put(authMiddleware, addToWishlist);
 router.route("/rating").put(authMiddleware, rating);
 

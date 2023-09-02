@@ -64,7 +64,7 @@ const getCategory = asyncHandler(async (req, res) => {
 
 const getallCategory = async (req, res) => {
 	try {
-		const allCategory = await Category.find();
+		const allCategory = await Category.find().sort({ createdAt: -1 });
 		res.status(200).json(allCategory);
 	} catch (error) {
 		res.status(500).json({ error: error.message });
